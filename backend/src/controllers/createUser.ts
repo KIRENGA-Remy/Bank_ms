@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import User from '../models/userModel'; 
 import bcrypt from 'bcrypt';
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response) : Promise<void> => {
     try {
         const { firstname, lastname, email, password, role, picturePath } = req.body;
 
         // Check if email already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: 'Email already in use' });
+            res.status(400).json({ error: 'Email already in use' });
         }
 
         // Hash the password
