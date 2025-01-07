@@ -1,11 +1,15 @@
-import express, { NextFunction, Request, Response} from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import userRoutes from './routes/userRoutes'; 
 import dotenv from 'dotenv';
+import connectDB from './config/db'; 
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB Atlas
+connectDB();
 
 // Middleware
 app.use(express.json());
