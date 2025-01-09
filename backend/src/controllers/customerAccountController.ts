@@ -73,3 +73,36 @@ export const depositMoney = async (req: Request, res: Response) => {
     }
 }
 
+// withdraw money
+export const withdrawMoney = async (req: Request, res: Response) => {
+    try {
+        const { accountNumber, amount } = req.body;
+
+        if (amount <= 0) {
+            res.status(400).json({ message: "Amount must be greater than 0." });
+            return;
+          }
+        const account = await CustomerAccount.findOne(accountNumber)
+        if( !account ) {
+            res.status(404).json({ message: "Account not found."})
+            return;
+        }
+
+        if ( account.balance < amount){
+            res.status(400).json({ message: " Insufficient funds."})
+        }
+
+        account.balance -= amount;
+        account.transactions.push({
+            transactionId: `TXN-${Date.now()}`,
+            type: "Withdrawal",
+            amount,
+            date: new Date(),
+            details: "Withdrawal",
+          });
+        await account.save();
+        res.status(200).json({ message: "Withdrawal successful", account });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to withdraw money", err})
+    }
+}
