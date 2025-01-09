@@ -1,4 +1,4 @@
-import mongoose, { model, Schema} from "mongoose";
+import { model, Schema} from "mongoose";
 const TransactionSchema = new Schema ({
     transactionId: { type: String, required: true},
     type: { type: String, required: true, enum: ["Deposit", "Withdrawal", "Transfer"]},
@@ -24,7 +24,7 @@ const CustomerAccountSchema = new Schema ({
     updatedAt: { type: Date, default: Date.now},
     transactions: [TransactionSchema],
     isActive: { type: Boolean, default: true},
-    passwordHash: { type: String, required: true }
+    password: { type: String, required: true }
 })
 
 export interface ICustomerAccount extends Document{
@@ -50,7 +50,7 @@ export interface ICustomerAccount extends Document{
       details?: string;
     }[];
     isActive: boolean;
-    passwordHash: string;
+    password: string;
 }
 
 export const CustomerAccount = model<ICustomerAccount>("CustomerAccount", CustomerAccountSchema);
