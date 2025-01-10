@@ -47,7 +47,8 @@ export const createAccount = async (req: Request, res: Response) => {
 // Deposit money
 export const depositMoney = async (req: Request, res: Response) => {
     try {
-        const { accountNumber, amount } = req.body;
+        const { accountNumber } = req.params;
+        const { amount } = req.body
         if (amount <=0 ){
             res.status(400).json({ message: "Amount must be greater than 0."})
             return;
@@ -58,6 +59,12 @@ export const depositMoney = async (req: Request, res: Response) => {
             res.status(404).json({ message: "Account not found."})
             return;
         }
+
+        if (!account.isActive) {
+            res.status(400).json({ message: "This account is deactivated you're required to request reactivation to progress."});
+            return;
+        }
+
         account.balance += amount;
         account.transactions.push({
             transactionId: `TXN-${Date.now()}`,
@@ -76,15 +83,21 @@ export const depositMoney = async (req: Request, res: Response) => {
 // withdraw money
 export const withdrawMoney = async (req: Request, res: Response) => {
     try {
-        const { accountNumber, amount } = req.body;
+        const { accountNumber } = req.params;
+        const { amount } = req.body;
 
         if (amount <= 0) {
             res.status(400).json({ message: "Amount must be greater than 0." });
             return;
           }
-        const account = await CustomerAccount.findOne(accountNumber)
+        const account = await CustomerAccount.findOne({ accountNumber })
         if( !account ) {
             res.status(404).json({ message: "Account not found."})
+            return;
+        }
+
+        if (!account.isActive) {
+            res.status(400).json({ message: "This account is deactivated you're required to request reactivation to progress."});
             return;
         }
 
@@ -124,6 +137,15 @@ export const transferMoney = async (req: Request, res: Response) => {
             res.status(404).json({ message: "Account not found." });
             return;
           }
+
+          if (!sender.isActive) {
+            res.status(400).json({ message: "This account is deactivated you're required to request reactivation to progress."});
+            return;
+        }
+        if (!recipient.isActive) {
+            res.status(400).json({ message: "This account is deactivated."});
+            return;
+        }
 
           if (sender.balance < amount) {
             res.status(400).json({ message: "Insufficient funds in sender's account." });

@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import userRoutes from './routes/userRoutes'; 
 import connectDB from './config/db';
 import customerAccountRoutes from './routes/customerAccountRoutes'
+import adminAccountRoutes from './routes/adminAccountRoutes'
 import { config } from 'dotenv';
 
 config()
@@ -14,9 +15,12 @@ connectDB();
 // Middleware
 app.use(express.json());
 
-// Routes
+// Registration routes
 app.use('/api/users', userRoutes);
+// Customer routes
 app.use('/api/customers', customerAccountRoutes)
+// Admin routes
+app.use('/api/admin', adminAccountRoutes)
 
 // Error handling middleware (optional)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

@@ -4,8 +4,7 @@ const TransactionSchema = new Schema ({
     type: { type: String, required: true, enum: ["Deposit", "Withdrawal", "Transfer"]},
     amount: { type: Number, requied: true},
     date: { type: Date, default: Date.now},
-    details: { type: String},
-    isDeactivatedTransaction: { type: Boolean, default: false }
+    details: { type: String}
 })
 
 const CustomerAccountSchema = new Schema ({
@@ -51,7 +50,6 @@ export interface ICustomerAccount extends Document{
       amount: number;
       date: Date;
       details?: string;
-      isDeactivatedTransaction?: boolean;
     }[];
     isActive: boolean;
     password: string;
