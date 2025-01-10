@@ -218,3 +218,57 @@ export const viewAccountBalance = async (req: Request, res: Response): Promise<v
       res.status(500).json({ message: "Failed to fetch account balance", err });
     }
   };
+
+// Applications of pagination
+export const getTransactions = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+        const { page=1, limit=10, txn_type, startDate, endDate, minAmount, maxAmount } = req.query
+
+        // Convert query parameters to appropriate types
+        const pageNumber = parseInt(page as string, 10);
+        const pageSize = parseInt(limit as string, 10)
+
+        const account = await CustomerAccount.findOne({ accountNumber});
+        if (!account){
+            res.status(404).json({ message: "Account not found." });
+            return;
+        }
+
+        // Filter transaction based on query parameters
+        let transactions = account.transactions;
+        if (txn_type){
+            transactions = transactions.filter((transaction: any) => transaction.type = txn_type);
+            return;
+        }
+
+        if(startDate){
+            const start = new Date(startDate as string);
+            transactions = transactions.filter((transaction: any) => new Date(transaction.date) >= start);
+            return;
+        }
+
+        if(endDate){
+            const end = new Date(endDate as string);
+            transactions = transactions.filter((transaction: any) => new Date(transaction.date) <= end);
+            return;
+        }
+
+        if(minAmount){
+            transactions = transactions.filter((transaction: any) => transaction.amount >= parseFloat(minAmount as string));
+            return;
+        }
+
+        if(maxAmount){
+            transactions = transactions.filter((transaction: any) => transaction.amount <= parseFloat(maxAmount as string));
+            return;
+        }
+
+        // Paginate the filtered transactions
+        const total = transactions.length;
+        const paginatedTransactions = transactions.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+        res.status(200).json({ total, page: pageNumber, limit: pageSize, transactions: paginatedTransactions});
+    } catch (err) {
+        res.status(500).json({ message: "Failed to fetch transactions", err });
+    }
+}
