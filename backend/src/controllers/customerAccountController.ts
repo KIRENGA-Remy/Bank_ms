@@ -238,30 +238,25 @@ export const getTransactions = async (req: Request, res: Response): Promise<void
         // Filter transaction based on query parameters
         let transactions = account.transactions;
         if (txn_type){
-            transactions = transactions.filter((transaction: any) => transaction.type = txn_type);
-            return;
+            transactions = transactions.filter((transaction: any) => transaction.type === txn_type);
         }
 
         if(startDate){
             const start = new Date(startDate as string);
             transactions = transactions.filter((transaction: any) => new Date(transaction.date) >= start);
-            return;
         }
 
         if(endDate){
             const end = new Date(endDate as string);
             transactions = transactions.filter((transaction: any) => new Date(transaction.date) <= end);
-            return;
         }
 
         if(minAmount){
             transactions = transactions.filter((transaction: any) => transaction.amount >= parseFloat(minAmount as string));
-            return;
         }
 
         if(maxAmount){
             transactions = transactions.filter((transaction: any) => transaction.amount <= parseFloat(maxAmount as string));
-            return;
         }
 
         // Paginate the filtered transactions
@@ -272,3 +267,109 @@ export const getTransactions = async (req: Request, res: Response): Promise<void
         res.status(500).json({ message: "Failed to fetch transactions", err });
     }
 }
+
+
+// Customer request to deactivate account
+export const requestDeactivation = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+
+        const account = await CustomerAccount.findOne({ accountNumber });
+        if (!account) {
+            res.status(404).json({ message: "Account not found." });
+            return;
+        }
+
+        // Only allow if the account is active
+        if (!account.isActive) {
+            res.status(400).json({ message: "Account is already deactivated." });
+            return;
+        }
+
+        account.deactivationRequest = true;
+        await account.save();
+
+        res.status(200).json({ message: "Deactivation request has been submitted for admin review." });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to submit deactivation request", err });
+    }
+};
+
+
+// Admin deactivates account
+export const deactivateAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+
+        const account = await CustomerAccount.findOne({ accountNumber });
+        if (!account) {
+            res.status(404).json({ message: "Account not found." });
+            return;
+        }
+
+        // Check if the account has a deactivation request
+        if (!account.reactivationRequest) {
+            res.status(400).json({ message: "No reactivation request found for this account." });
+            return;
+        }
+
+        account.isActive = false;
+        account.deactivationRequest = false; 
+        await account.save();
+
+        res.status(200).json({ message: "Account has been deactivated." });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to deactivate account", err });
+    }
+};
+
+
+
+// Customer request to deactivate account
+export const requestReactivation = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+
+        const account = await CustomerAccount.findOne({ accountNumber });
+        if (!account) {
+            res.status(404).json({ message: "Account not found." });
+            return;
+        }
+
+        // Only allow if the account is active
+        if (account.isActive) {
+            res.status(400).json({ message: "Account is already active." });
+            return;
+        }
+
+        account.reactivationRequest = true;
+        await account.save();
+
+        res.status(200).json({ message: "Reactivation request has been submitted for admin review." });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to submit reactivation request", err });
+    }
+};
+
+
+// Admin reactivates account
+export const reactivateAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+
+        const account = await CustomerAccount.findOne({ accountNumber });
+        if (!account) {
+            res.status(404).json({ message: "Account not found." });
+            return;
+        }
+
+        // Reactivate the account
+        account.isActive = true;
+        account.reactivationRequest = false;  
+        await account.save();
+
+        res.status(200).json({ message: "Account has been reactivated." });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to reactivate account", err });
+    }
+};

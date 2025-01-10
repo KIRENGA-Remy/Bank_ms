@@ -4,7 +4,8 @@ const TransactionSchema = new Schema ({
     type: { type: String, required: true, enum: ["Deposit", "Withdrawal", "Transfer"]},
     amount: { type: Number, requied: true},
     date: { type: Date, default: Date.now},
-    details: { type: String}
+    details: { type: String},
+    isDeactivatedTransaction: { type: Boolean, default: false }
 })
 
 const CustomerAccountSchema = new Schema ({
@@ -24,7 +25,9 @@ const CustomerAccountSchema = new Schema ({
     updatedAt: { type: Date, default: Date.now},
     transactions: [TransactionSchema],
     isActive: { type: Boolean, default: true},
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    deactivationRequest: { type: Boolean, default: false },  
+    reactivationRequest: { type: Boolean, default: false }  
 })
 
 export interface ICustomerAccount extends Document{
@@ -48,9 +51,12 @@ export interface ICustomerAccount extends Document{
       amount: number;
       date: Date;
       details?: string;
+      isDeactivatedTransaction?: boolean;
     }[];
     isActive: boolean;
     password: string;
+    deactivationRequest: boolean;
+    reactivationRequest: boolean;
 }
 
 export const CustomerAccount = model<ICustomerAccount>("CustomerAccount", CustomerAccountSchema);
