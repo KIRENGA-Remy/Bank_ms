@@ -90,6 +90,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
 
         if ( account.balance < amount){
             res.status(400).json({ message: " Insufficient funds."})
+            return;
         }
 
         account.balance -= amount;
@@ -105,4 +106,71 @@ export const withdrawMoney = async (req: Request, res: Response) => {
     } catch (err) {
         res.status(500).json({ message: "Failed to withdraw money", err})
     }
+}
+
+//Transfer money
+export const transferMoney = async (req: Request, res: Response) => {
+    try {
+        const { fromAccount, toAccount, amount } = req.body;
+
+        if (amount <= 0) {
+            res.status(400).json({ message: "Amount must be greater than 0." });
+            return;
+          }
+          const sender = await CustomerAccount.findOne({ accountNumber: fromAccount})
+          const recipient = await CustomerAccount.findOne({ accountNumber: toAccount})
+
+          if (!sender || !recipient) {
+            res.status(404).json({ message: "Account not found." });
+            return;
+          }
+
+          if (sender.balance < amount) {
+            res.status(400).json({ message: "Insufficient funds in sender's account." });
+            return;
+          }
+          // Deduct from sender
+          sender.balance -= amount;
+          sender.transactions.push({
+            transactionId: `TXN-${Date.now()}`,
+            type: "Transfer",
+            amount,
+            date: new Date(),
+            details: `Transfer to ${toAccount}`
+          })
+
+          // Add to recipient
+          recipient.balance += amount;
+          recipient.transactions.push({
+            transactionId: `TXN-${Date.now()}`,
+            type: "Transfer",
+            amount,
+            date: new Date(),
+            details: `Transfer from ${fromAccount}`
+          })
+
+          await sender.save();
+          await recipient.save();
+
+          res.status(200).json({ message: "Transfer successful", sender, recipient });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to transfer money", err})
+    }
+}
+
+// Fetch account details
+export const getAccountDetails = async (req: Request, res:Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+    
+        const account = await CustomerAccount.findOne({ accountNumber });
+        if (!account) {
+        res.status(404).json({ message: "Account not found." });
+        return;
+        }
+    
+        res.status(200).json({ account });
+      } catch (err) {
+        res.status(500).json({ message: "Failed to fetch account details", err });
+      }
 }

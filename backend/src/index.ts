@@ -1,14 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
 import userRoutes from './routes/userRoutes'; 
-import dotenv from 'dotenv';
-import connectDB from './config/db'; 
+import connectDB from './config/db';
+import customerAccountRoutes from './routes/customerAccountRoutes'
+import { config } from 'dotenv';
 
-dotenv.config();
+config()
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB Atlas
 connectDB();
 
 // Middleware
@@ -16,6 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/customers', customerAccountRoutes)
 
 // Error handling middleware (optional)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -23,5 +24,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port http://localhost:${PORT}`);
 });
