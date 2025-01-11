@@ -10,6 +10,8 @@ import {
     getTransactions, 
     requestReactivation,
     requestDeactivation,
+    updateAccount,
+    deleteAccount
 } from '../controllers/customerAccountController';
 
 const router = express.Router();
@@ -23,5 +25,7 @@ router.get('/balance/:accountNumber', viewAccountBalance);
 router.get('/:accountNumber/transactions', getTransactions);
 router.post('/account/:accountNumber/request-deactivation', requestDeactivation);
 router.post('/account/:accountNumber/request-reactivation', requestReactivation);
+router.put('/account/:accountNumber/update-account', updateAccount);
+router.delete('/account/:accountNumber/delete-account', deleteAccount)
 
 export default router;

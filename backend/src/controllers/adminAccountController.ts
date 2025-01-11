@@ -63,7 +63,7 @@ export const getAllAccounts = async (req: Request, res: Response): Promise<void>
 }
 
 
-export const updateAccounts = async (req: Request, res: Response): Promise<void> => {
+export const updateAccount = async (req: Request, res: Response): Promise<void> => {
     try {
         const { accountNumber } = req.params;
 
@@ -93,3 +93,32 @@ export const updateAccounts = async (req: Request, res: Response): Promise<void>
     }
 };
 
+
+export const getAccountTransactions = async(req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+        const account = await CustomerAccount.findOne({ accountNumber});
+        if(!account){
+            res.status(404).json({ message: "Account not found."});
+            return;
+        }
+        res.status(200).json({ transactions: account.transactions})
+    } catch (err) {
+        res.status(500).json({ message: "Failed to get account's transactions.", err})
+    }
+}
+
+export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { accountNumber } = req.params;
+        const deletedAccount = await CustomerAccount.findOneAndDelete({ accountNumber });
+
+    if (!deletedAccount) {
+      res.status(404).json({ message: "No account found with the given account number." });
+      return;
+    }
+    res.status(200).json({ message: "Account deleted successfully."})
+    } catch (err) {
+        res.status(500).json({ message: "Failed to delete account.", err})
+    }
+}
