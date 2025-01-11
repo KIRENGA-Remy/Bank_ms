@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { CustomerAccount } from '../models/customerAccount';
 import { Parser } from 'json2csv';
+import PDFDocument from 'pdfkit'
 
 // Admin deactivates account
 export const deactivateAccount = async (req: Request, res: Response): Promise<void> => {
@@ -214,7 +215,7 @@ export const getTransactionAnalytics = async (req: Request, res: Response): Prom
   }
 
 
-export const exportFinancialData = async (req: Request, res: Response): Promise<void> => {
+export const exportFinancialDataAsCSV = async (req: Request, res: Response): Promise<void> => {
     try {
         const accounts = await CustomerAccount.find({}, "customerName balance transactions");
         const data = accounts.map((account: any) => ({
@@ -230,7 +231,44 @@ export const exportFinancialData = async (req: Request, res: Response): Promise<
         res.attachment("financial_data.csv");
         res.send(csv);
     } catch (err) {
-        res.status(500).json({ message: "Failed to export financial data", err})
+        res.status(500).json({ message: "Failed to export financial data as CSV", err})
+    }
+}
+
+
+export const exportFinancialDataAsPDF = async (req: Request, res: Response): Promise<void> => {
+    try {
+       const accounts = await CustomerAccount.find({}, "customerName balance transactions");
+       const data = accounts.map((account: any) => ({
+        customerName: account.customerName,
+        balance: account.balance,
+        totalTransactions: account.transactions.length
+       }))
+
+        // Create a new PDF document
+       const doc = new PDFDocument();
+
+       //Set response headers
+       res.setHeader("Content-Type", "application/pdf");
+       res.setHeader("Content-Disposition", "attachment; filename=financial_data.pdf");
+
+       // Pipe the PDF document to the response
+       doc.pipe(res)
+
+       doc.fontSize(16).text('Financial Data Report', { align: 'center'})
+       doc.moveDown();
+
+       data.forEach((account: any, index: any) => {
+        doc.fontSize(12).text(`Customer ${index + 1}:`);
+        doc.text(` Name: ${account.customerName}`);
+        doc.text(` Balance: $${account.balance}`);
+        doc.text(` Total Transactions: ${account.totalTransactions}`);
+        doc.moveDown()
+       });
+
+       doc.end();
+    } catch (err) {
+        res.status(500).json({ message: "Failed to export financial data as PDF", err})
     }
 }
 
