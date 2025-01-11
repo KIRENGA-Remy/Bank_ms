@@ -8,7 +8,8 @@ import {
     deleteAccount,
     getFinancialReports,
     getTransactionAnalytics,
-    sendCustomerNotification
+    sendCustomerNotification,
+    exportFinancialData
  } from '../controllers/adminAccountController';
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.delete('/account/:accountNumber/delete-account', deleteAccount);
 router.get('/accounts/get-financial-reports', getFinancialReports)
 router.get('/accounts/get-transaction-analytics', getTransactionAnalytics)
 router.get('/account/send-customer-notofication', sendCustomerNotification)
+router.get('/accounts/export-financial-data', exportFinancialData)
 
 export default router;

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { CustomerAccount } from '../models/customerAccount';
+import { Parser } from 'json2csv';
 
 // Admin deactivates account
 export const deactivateAccount = async (req: Request, res: Response): Promise<void> => {
@@ -211,3 +212,26 @@ export const getTransactionAnalytics = async (req: Request, res: Response): Prom
         res.status(500).json({ message: "Failed to send notification to the customer.", err})
     }
   }
+
+
+export const exportFinancialData = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const accounts = await CustomerAccount.find({}, "customerName balance transactions");
+        const data = accounts.map((account: any) => ({
+            customerName: account?.customerName,
+            balance: account?.balance,
+            totalTransactions: account?.transactions?.length
+        }))
+
+        const parser = new Parser();
+        const csv = parser.parse(data);
+
+        res.header("Content-Type", "text/csv");
+        res.attachment("financial_data.csv");
+        res.send(csv);
+    } catch (err) {
+        res.status(500).json({ message: "Failed to export financial data", err})
+    }
+}
+
+
