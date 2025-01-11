@@ -7,6 +7,12 @@ const TransactionSchema = new Schema ({
     details: { type: String}
 })
 
+const NotificationSchema = new Schema({
+  title: { type: String, required: true },
+  message: { type: String, required: true },
+  date: { type: Date, default: Date.now },
+});
+
 const CustomerAccountSchema = new Schema ({
     accountNumber: { type: String, required: true, unique: true},
     customerName: { type: String, required: true},
@@ -26,7 +32,8 @@ const CustomerAccountSchema = new Schema ({
     isActive: { type: Boolean, default: true},
     password: { type: String, required: true },
     deactivationRequest: { type: Boolean, default: false },  
-    reactivationRequest: { type: Boolean, default: false }  
+    reactivationRequest: { type: Boolean, default: false },
+    notifications: [NotificationSchema]
 })
 
 export interface ICustomerAccount extends Document{
@@ -55,6 +62,11 @@ export interface ICustomerAccount extends Document{
     password: string;
     deactivationRequest: boolean;
     reactivationRequest: boolean;
+    notifications:{
+      title: string,
+      message: string,
+      date: Date,
+  }[];
 }
 
 export const CustomerAccount = model<ICustomerAccount>("CustomerAccount", CustomerAccountSchema);

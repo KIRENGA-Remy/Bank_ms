@@ -156,3 +156,58 @@ export const getFinancialReports = async (req: Request, res: Response): Promise<
         res.status(500).json({ message: "Failed to generate financial reports.", err})
     }
 }
+
+
+export const getTransactionAnalytics = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { startDate, endDate } = req.query;
+  
+      const matchCondition: any = {};
+      if (startDate && endDate) {
+        matchCondition["transactions.date"] = {
+          $gte: new Date(startDate as string),
+          $lte: new Date(endDate as string),
+        };
+      }
+  
+      const analytics = await CustomerAccount.aggregate([
+        { $unwind: "$transactions" },
+        { $match: matchCondition },
+        {
+          $group: {
+            _id: "$transactions.type",
+            totalTransactions: { $sum: 1 },
+            totalAmount: { $sum: "$transactions.amount" },
+          },
+        },
+      ]);
+  
+      res.status(200).json({ analytics });
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch transaction analytics.", err });
+    }
+  };
+  
+
+  export const sendCustomerNotification = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { customerId } = req.params;
+        const { title, message } = req.body;
+
+        const customer = await CustomerAccount.findById(customerId);
+        if(!customer){
+            res.status(404).json({ message: "Customer not found."})
+            return;
+        }
+        const notification = {
+            title,
+            message,
+            date: new Date()
+        }
+        customer.notifications = customer.notifications || [];
+        customer.notifications.push(notification);
+        await customer.save();
+    } catch (err) {
+        res.status(500).json({ message: "Failed to send notification to the customer.", err})
+    }
+  }
