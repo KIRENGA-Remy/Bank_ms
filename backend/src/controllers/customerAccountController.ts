@@ -318,35 +318,6 @@ export const requestDeactivation = async (req: Request, res: Response): Promise<
 };
 
 
-// Admin deactivates account
-export const deactivateAccount = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { accountNumber } = req.params;
-
-        const account = await CustomerAccount.findOne({ accountNumber });
-        if (!account) {
-            res.status(404).json({ message: "Account not found." });
-            return;
-        }
-
-        // Check if the account has a deactivation request
-        if (!account.reactivationRequest) {
-            res.status(400).json({ message: "No reactivation request found for this account." });
-            return;
-        }
-
-        account.isActive = false;
-        account.deactivationRequest = false; 
-        await account.save();
-
-        res.status(200).json({ message: "Account has been deactivated." });
-    } catch (err) {
-        res.status(500).json({ message: "Failed to deactivate account", err });
-    }
-};
-
-
-
 // Customer request to deactivate account
 export const requestReactivation = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -373,25 +344,42 @@ export const requestReactivation = async (req: Request, res: Response): Promise<
     }
 };
 
-
-// Admin reactivates account
-export const reactivateAccount = async (req: Request, res: Response): Promise<void> => {
+interface CustomRequest extends Request {
+    user?:{
+        id: string
+    }
+}
+export const updateAccount = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
         const { accountNumber } = req.params;
-
-        const account = await CustomerAccount.findOne({ accountNumber });
-        if (!account) {
-            res.status(404).json({ message: "Account not found." });
+        const customerId = req.user?.id;
+        const updates = req.body;
+        const account = await CustomerAccount.findOne({ accountNumber})
+        if(!account){
+            res.status(404).json({ message: "No account found."})
             return;
         }
+        if( account._id.toString() !== customerId){
+            res.status(403).json({ message: "You are not authorized to update this account." });
+            return;
+        }
+         // Restrict the fields that can be updated
+         const allowedUpdates = ["customerName", "email", "phone", "address"];
+         const filteredUpdates: Partial<typeof updates> = {};
+         for (const key of allowedUpdates) {
+             if (updates[key] !== undefined) {
+                 filteredUpdates[key] = updates[key];
+             }
+         }
 
-        // Reactivate the account
-        account.isActive = true;
-        account.reactivationRequest = false;  
-        await account.save();
+        const updatedAccount = await CustomerAccount.findOneAndUpdate(
+            { accountNumber},
+            { ...filteredUpdates, updatedAt: new Date()},
+            {new: true, runValidators: true}
+        )
 
-        res.status(200).json({ message: "Account has been reactivated." });
+        res.status(200).json({ message: "Account updated successfully.", account: updatedAccount})
     } catch (err) {
-        res.status(500).json({ message: "Failed to reactivate account", err });
+        res.status(500).json({ message: "Failed to update account", err })
     }
-};
+}
