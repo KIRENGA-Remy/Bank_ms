@@ -122,3 +122,37 @@ export const deleteAccount = async (req: Request, res: Response): Promise<void> 
         res.status(500).json({ message: "Failed to delete account.", err})
     }
 }
+
+
+export const getFinancialReports = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const totalDeposits = await CustomerAccount.aggregate([
+            { $unwind: "$transactions"},
+            { $match: { "transactions.type": "Deposit"}},
+            { $group: {_id: null, totalAmount : { $sum: "$transactions.amount"}}}
+        ]);
+
+        const totalWithdrawals = await CustomerAccount.aggregate([
+            {$unwind: "$transactions"},
+            {$match: {"transactions.type": "Withdrawal"}},
+            {$group: { _id: null, totalAmount: { $sum: "$transactions.amount"}}}
+        ])
+
+        const totalTransfers = await CustomerAccount.aggregate([
+            { $unwind: "$transactions"},
+            { $match: { "transactions.type": "Transfer"}},
+            { $group: { _id: null, totalAmount: {$sum: "$transactions.amount"}}}
+        ])
+
+        const activeAccountsCount = await CustomerAccount.countDocuments({ isActive: true });
+
+        res.status(200).json({ 
+            totalDeposits: totalDeposits[0]?.totalAmount || 0,
+            totalWithdrawals: totalWithdrawals[0]?.totalAmount || 0,
+            totalTransfers: totalTransfers[0]?.totalAmount || 0,
+            activeAccountsCount
+        })
+    } catch (err) {
+        res.status(500).json({ message: "Failed to generate financial reports.", err})
+    }
+}
