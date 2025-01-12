@@ -4,6 +4,7 @@ import connectDB from './config/db';
 import customerAccountRoutes from './routes/customerAccountRoutes'
 import adminAccountRoutes from './routes/adminAccountRoutes'
 import { config } from 'dotenv';
+import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
 
 config()
 
@@ -12,15 +13,21 @@ const PORT = process.env.PORT || 5000;
 
 connectDB();
 
+// Serve Swagger docs at /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Middleware
 app.use(express.json());
+app.get('/', (req: Request, res: Response) => {
+    res.send("APP is running");
+});
 
 // Registration routes
-app.use('/api/users', userRoutes);
+app.use('/users', userRoutes);
 // Customer routes
-app.use('/api/customers', customerAccountRoutes)
+app.use('/customers', customerAccountRoutes)
 // Admin routes
-app.use('/api/admin', adminAccountRoutes)
+app.use('/admin', adminAccountRoutes)
 
 // Error handling middleware (optional)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -28,5 +35,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port http://localhost:${PORT}`);
+    console.log(`Server running on port http://localhost:${PORT}/api`);
 });

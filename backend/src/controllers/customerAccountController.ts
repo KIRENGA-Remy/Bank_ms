@@ -37,10 +37,10 @@ export const createAccount = async (req: Request, res: Response) => {
             accountType
         })
         await newAccount.save();
-        res.status(201).json({ message: "Account created successfully", account: newAccount})
+        res.status(200).json({ message: "Account created successfully", account: newAccount})
 
     } catch (err) {
-        res.status(500).json({ message: "Failed to create account", err})
+        res.status(500).json({ message: "Failed to create account.", err})
     }
 }
 
