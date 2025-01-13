@@ -7,21 +7,17 @@ const options = {
         info: {
             title: 'Bank Management System API',
             version: '1.0.0',
-            description: 'API documentation for the Bank Management System',
-            contact: {
-                name: 'GITOLI Remy Claudien',
-                email: 'gitoliremy@gmail.com'
-            }
+            description: 'API documentation for the Bank Management System'
         },
         servers: [
             {
-                url: 'http://localhost:4321/api',
+                url: 'http://localhost:4321',
                 description: 'Development server'
             }
         ]
     },
     // Paths to API files
-    apis: ['../routes/*.ts']
+    apis: ['./src/routes/*.ts']
 }
 
 // Initialize swagger-jsdoc
