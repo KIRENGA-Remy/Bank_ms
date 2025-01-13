@@ -5,6 +5,7 @@ import customerAccountRoutes from './routes/customerAccountRoutes'
 import adminAccountRoutes from './routes/adminAccountRoutes'
 import { config } from 'dotenv';
 import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
+import { v4 as uuidv4 } from 'uuid';
 
 config()
 

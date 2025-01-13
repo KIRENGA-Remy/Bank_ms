@@ -1,15 +1,48 @@
 import { Request, Response } from 'express'
 import { CustomerAccount } from '../models/customerAccount';
 import bcrypt from 'bcrypt'
+import mongoose from 'mongoose';
+import validator from 'validator';
+
+interface CreateAccountRequest {
+    customerName: string;
+    email: string;
+    phone: string;
+    accountType: string;
+    password: string;
+    address?: {
+        street?: string;
+        city?: string;
+        state?: string;
+        postalCode?: string
+    }
+}
 
 export const createAccount = async (req: Request, res: Response) => {
     try {
-        const { accountNumber, customerName, email, phone, address, accountType, password } = req.body;
+        const { 
+            customerName, 
+            email, 
+            phone, 
+            address, 
+            accountType, 
+            password 
+        } = req.body as CreateAccountRequest;
 
         // Validate required fields
-        if (!accountNumber || !customerName || !email || !phone || !accountType || !password) {
+        if (!customerName || !email || !phone || !accountType || !password) {
         res.status(400).json({ error: "Missing required fields" });
         return;
+        }
+
+        if (!validator.isEmail(email)) {
+            res.status(400).json({ message: "Invalid email address." });
+            return; 
+        }
+
+        if(password.length < 8){
+            res.status(400).json({ error: "Password must be at least 8 characters long."});
+            return;
         }
         
         // check for existing account
@@ -23,7 +56,6 @@ export const createAccount = async (req: Request, res: Response) => {
 
         //Create account
         const newAccount = new CustomerAccount({
-            accountNumber,
             customerName,
             password: hashedPassword,
             email,
@@ -37,10 +69,20 @@ export const createAccount = async (req: Request, res: Response) => {
             accountType
         })
         await newAccount.save();
-        res.status(200).json({ message: "Account created successfully", account: newAccount})
+        const responseAccount = {
+            accountNumber: newAccount.accountNumber,
+            customerName: newAccount.customerName,
+            email: newAccount.email,
+            phone: newAccount.phone,
+            address: newAccount.address,
+            accountType: newAccount.accountType,
+            balance: newAccount.balance
+        }
+        res.status(200).json({ message: "Account created successfully", account: responseAccount})
 
     } catch (err) {
-        res.status(500).json({ message: "Failed to create account.", err})
+        console.log("Error creating account", err);
+        res.status(500).json({ message: "Failed to create account."})
     }
 }
 
@@ -274,17 +316,26 @@ export const getTransactions = async (req: Request, res: Response): Promise<void
         }
 
         if(minAmount){
-            transactions = transactions.filter((transaction: any) => transaction.amount >= parseFloat(minAmount as string));
+            const min = parseFloat(minAmount as string);
+            transactions = transactions.filter((transaction: any) => transaction.amount >= min);
         }
 
         if(maxAmount){
-            transactions = transactions.filter((transaction: any) => transaction.amount <= parseFloat(maxAmount as string));
+            const max = parseFloat(maxAmount as string)
+            transactions = transactions.filter((transaction: any) => transaction.amount <= max);
         }
 
         // Paginate the filtered transactions
-        const total = transactions.length;
-        const paginatedTransactions = transactions.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-        res.status(200).json({ total, page: pageNumber, limit: pageSize, transactions: paginatedTransactions});
+        const totalTransactions = transactions.length;
+        const startIndex = (pageNumber - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedTransactions = transactions.slice(startIndex, endIndex);
+        res.status(200).json({ 
+            totalTransactions,
+            totalPages: Math.ceil(totalTransactions / pageSize),
+            currentPage: pageNumber,
+            transactions: paginatedTransactions,
+        });
     } catch (err) {
         res.status(500).json({ message: "Failed to fetch transactions", err });
     }
@@ -349,17 +400,19 @@ interface CustomRequest extends Request {
         id: string
     }
 }
+
+
 export const updateAccount = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
         const { accountNumber } = req.params;
         const customerId = req.user?.id;
         const updates = req.body;
-        const account = await CustomerAccount.findOne({ accountNumber})
+        const account = await CustomerAccount.findOne({ accountNumber }) as (typeof CustomerAccount.schema.obj & {_id: mongoose.Types.ObjectId}) | null;
         if(!account){
             res.status(404).json({ message: "No account found."})
             return;
         }
-        if( account._id.toString() !== customerId){
+        if( account?._id.toString() !== customerId){
             res.status(403).json({ message: "You are not authorized to update this account." });
             return;
         }
@@ -395,6 +448,7 @@ export const deleteAccount = async (req: Request, res: Response): Promise<void> 
     }
     res.status(200).json({ message: "Account deleted successfully."})
     } catch (err) {
-        res.status(500).json({ message: "Failed to delete account.", err})
+        console.log("Failed to delete account", err);
+        res.status(500).json({ message: "Failed to delete account."});
     }
 }

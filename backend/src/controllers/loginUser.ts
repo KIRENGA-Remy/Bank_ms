@@ -10,15 +10,15 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         // Check if user exists
         const user = await User.findOne({ email });
         if (!user) {
-            res.status(404).json({ error: 'Invalid email or password' });
-            return; // Exit early if user is not found
+            res.status(404).json({message: 'Invalid email' });
+            return; 
         }
 
         // Validate password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            res.status(401).json({ error: 'Invalid email or password' });
-            return; // Exit early if password is invalid
+            res.status(401).json({ error: 'Invalid password' });
+            return; 
         }
 
         // Generate JWT token
@@ -37,9 +37,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
                 role: user.role,
                 firstname: user.firstname,
                 lastname: user.lastname,
+                picturePath: user.picturePath
             },
         });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (err) {
+        res.status(500).json({ message: "Failed to login.",err });
     }
 };
