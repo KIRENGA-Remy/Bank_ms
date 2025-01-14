@@ -18,7 +18,7 @@ const router = express.Router();
 
 /** 
  * @swagger
- * /account/:accountNumber/deactivate:
+ * /admin/account/:accountNumber/deactivate:
  *   put:
  *     summary: Deactivate an account
  *     description: This endpoint deactivates an account based on the account number. If there is a reactivation request, it will process the deactivation and set the account as inactive.
@@ -43,7 +43,7 @@ router.put('/account/:accountNumber/deactivate', deactivateAccount);
 
 /** 
  * @swagger
- * /account/:accountNumber/reactivate:
+ * /admin/account/:accountNumber/reactivate:
  *   put:
  *     summary: Reactivate an account
  *     description: This endpoint reactivates an account based on the account number.

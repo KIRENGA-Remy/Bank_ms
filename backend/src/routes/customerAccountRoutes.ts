@@ -1,11 +1,24 @@
 import express from 'express';
-import { createAccount, withdrawMoney, depositMoney, transferMoney, getAccountDetails, viewCustomerProfile, viewAccountBalance, getTransactions, requestReactivation, requestDeactivation, updateAccount, deleteAccount } from '../controllers/customerAccountController';
+import { 
+    createAccount, 
+    withdrawMoney, 
+    depositMoney, 
+    transferMoney, 
+    getAccountDetails, 
+    viewCustomerProfile, 
+    viewAccountBalance, 
+    getTransactions, 
+    requestReactivation, 
+    requestDeactivation, 
+    updateAccount, 
+    deleteAccount 
+} from '../controllers/customerAccountController';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /create:
+ * /customers/create:
  *   post:
  *     summary: Create Customer account
  *     description: This endpoint helps to create customer account.
@@ -50,7 +63,7 @@ router.post('/create', createAccount);
 
 /**
  * @swagger
- * /deposit/{accountNumber}:
+ * /customers/deposit/{accountNumber}:
  *   post:
  *     summary: Deposit money into account
  *     description: This endpoint allows a customer to deposit money into their account.
@@ -81,7 +94,7 @@ router.post('/deposit/:accountNumber', depositMoney);
 
 /**
  * @swagger
- * /withdraw/{accountNumber}:
+ * /customers/withdraw/{accountNumber}:
  *   post:
  *     summary: Withdraw money from account
  *     description: This endpoint allows a customer to withdraw money from their account.
@@ -112,7 +125,7 @@ router.post('/withdraw/:accountNumber', withdrawMoney);
 
 /**
  * @swagger
- * /transfer:
+ * /customers/transfer:
  *   post:
  *     summary: Transfer money from one account to another
  *     description: This endpoint allows a customer to transfer money from one account to another.
@@ -140,7 +153,7 @@ router.post('/transfer', transferMoney);
 
 /**
  * @swagger
- * /{accountNumber}:
+ * /customers/account/{accountNumber}:
  *   get:
  *     summary: Get account details
  *     description: Fetch the details of a customer account.
@@ -163,7 +176,7 @@ router.get('/account/:accountNumber', getAccountDetails);
 
 /**
  * @swagger
- * /profile/{accountNumber}:
+ * /customers/profile/{accountNumber}:
  *   get:
  *     summary: View customer profile
  *     description: Fetch the profile details of a customer.
@@ -186,7 +199,7 @@ router.get('/profile/:accountNumber', viewCustomerProfile);
 
 /**
  * @swagger
- * /balance/{accountNumber}:
+ * /customers/balance/{accountNumber}:
  *   get:
  *     summary: View account balance
  *     description: Fetch the balance of a customer's account.
@@ -209,7 +222,7 @@ router.get('/balance/:accountNumber', viewAccountBalance);
 
 /**
  * @swagger
- * /{accountNumber}/transactions:
+ * /customers/{accountNumber}/transactions:
  *   get:
  *     summary: Get account transactions
  *     description: Retrieve transactions of a customer's account with pagination and filtering.
@@ -276,7 +289,7 @@ router.get('/:accountNumber/transactions', getTransactions);
 
 /**
  * @swagger
- * /account/{accountNumber}/request-deactivation:
+ * /customers/account/{accountNumber}/request-deactivation:
  *   post:
  *     summary: Request deactivation of account
  *     description: Submit a request to deactivate a customer's account.
@@ -299,7 +312,7 @@ router.post('/account/:accountNumber/request-deactivation', requestDeactivation)
 
 /**
  * @swagger
- * /account/{accountNumber}/request-reactivation:
+ * /customers/account/{accountNumber}/request-reactivation:
  *   post:
  *     summary: Request reactivation of account
  *     description: Submit a request to reactivate a customer's account.
@@ -322,7 +335,7 @@ router.post('/account/:accountNumber/request-reactivation', requestReactivation)
 
 /**
  * @swagger
- * /account/{accountNumber}/update-account:
+ * /customers/account/{accountNumber}/update-account:
  *   put:
  *     summary: Update customer account
  *     description: This endpoint allows a customer to update their account details.
@@ -368,7 +381,7 @@ router.put('/account/:accountNumber/update-account', updateAccount);
 
 /**
  * @swagger
- * /account/{accountNumber}/delete-account:
+ * /customers/account/{accountNumber}/delete-account:
  *   delete:
  *     summary: Delete customer account
  *     description: This endpoint allows a customer to delete their account.

@@ -15,7 +15,7 @@ export const deactivateAccount = async (req: Request, res: Response): Promise<vo
         }
 
         // Check if the account has a deactivation request
-        if (!account.reactivationRequest) {
+        if (!account.reactivationRequest == false) {
             res.status(400).json({ message: "No reactivation request found for this account." });
             return;
         }
@@ -24,7 +24,7 @@ export const deactivateAccount = async (req: Request, res: Response): Promise<vo
         account.deactivationRequest = false; 
         await account.save();
 
-        res.status(200).json({ message: "Account has been deactivated." });
+        res.status(200).json({ message: "Account in inactivate mode." });
     } catch (err) {
         res.status(500).json({ message: "Failed to deactivate account", err });
     }
@@ -41,13 +41,18 @@ export const reactivateAccount = async (req: Request, res: Response): Promise<vo
             res.status(404).json({ message: "Account not found." });
             return;
         }
+        // Check if the account has a deactivation request
+        if (!account.deactivationRequest == false) {
+            res.status(400).json({ message: "No deactivation request found for this account." });
+            return;
+        }
 
         // Reactivate the account
         account.isActive = true;
         account.reactivationRequest = false;  
         await account.save();
 
-        res.status(200).json({ message: "Account has been reactivated." });
+        res.status(200).json({ message: "Account in active mode." });
     } catch (err) {
         res.status(500).json({ message: "Failed to reactivate account", err });
     }
