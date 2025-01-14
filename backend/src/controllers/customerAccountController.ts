@@ -241,7 +241,34 @@ export const transferMoney = async (req: Request, res: Response) => {
           await sender.save();
           await recipient.save();
 
-          res.status(200).json({ message: "Transfer successful", sender, recipient });
+          const senderAccountTransferResponse = {
+            address:sender.address,
+            _id: sender._id,
+            customerName: sender.customerName,
+            email: sender.email,
+            phone: sender.phone,
+            balance: sender.balance,
+            accountType: sender.accountType,
+            createdAt: sender.createdAt,
+            updatedAt: sender.updatedAt,
+            transactions: sender.transactions,
+            accountNumber: sender.accountNumber
+        }
+
+        const recipientAccountTransferResponse = {
+            address: recipient.address,
+            _id: recipient._id,
+            customerName: recipient.customerName,
+            email: recipient.email,
+            phone: recipient.phone,
+            balance: recipient.balance,
+            accountType: recipient.accountType,
+            createdAt: recipient.createdAt,
+            updatedAt: recipient.updatedAt,
+            transactions: recipient.transactions,
+            accountNumber: recipient.accountNumber
+        }
+          res.status(200).json({ message: "Transfer successful", senderAccountTransferResponse, recipientAccountTransferResponse});
     } catch (err) {
         res.status(500).json({ message: "Failed to transfer money", err})
     }
@@ -252,13 +279,13 @@ export const getAccountDetails = async (req: Request, res:Response): Promise<voi
     try {
         const { accountNumber } = req.params;
     
-        const account = await CustomerAccount.findOne({ accountNumber });
+        const account = await CustomerAccount.findOne({ accountNumber }) as (typeof CustomerAccount.schema.obj)
         if (!account) {
         res.status(404).json({ message: "Account not found." });
         return;
         }
     
-        res.status(200).json({ account });
+        res.status(200).json({message: "Account details retrieved", account });
       } catch (err) {
         res.status(500).json({ message: "Failed to fetch account details", err });
       }
@@ -285,7 +312,7 @@ export const viewCustomerProfile = async (req: Request, res: Response): Promise<
             accountType: account.accountType,
             createdAt: account.createdAt,
         }
-        res.status(200).json({ profile })
+        res.status(200).json({message: "Customer profile retrieved", profile })
     } catch (err) {
         res.status(500).json({ message: "Failed to get customer profile", err})
     }
@@ -302,7 +329,7 @@ export const viewAccountBalance = async (req: Request, res: Response): Promise<v
         return;
       }
   
-      res.status(200).json({ balance: account.balance });
+      res.status(200).json({message: "View customer account balance", balance: account.balance });
     } catch (err) {
       res.status(500).json({ message: "Failed to fetch account balance", err });
     }

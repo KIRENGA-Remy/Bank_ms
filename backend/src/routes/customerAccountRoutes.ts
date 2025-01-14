@@ -159,7 +159,7 @@ router.post('/transfer', transferMoney);
  *       500:
  *         description: Failed to fetch account details.
  */
-router.get('/:accountNumber', getAccountDetails);
+router.get('/account/:accountNumber', getAccountDetails);
 
 /**
  * @swagger
