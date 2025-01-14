@@ -116,7 +116,20 @@ export const depositMoney = async (req: Request, res: Response) => {
             details: "Deposit"
         })
         await account.save();
-        res.status(201).json({ message: " Deposit successful", account})
+        const accountDepositResponse = {
+                    address:account.address,
+                    _id: account._id,
+                    customerName: account.customerName,
+                    email: account.email,
+                    phone: account.phone,
+                    balance: account.balance,
+                    accountType: account.accountType,
+                    createdAt: account.createdAt,
+                    updatedAt: account.updatedAt,
+                    transactions: account.transactions,
+                    accountNumber: account.accountNumber
+                }
+        res.status(201).json({ message: " Deposit successful", accountDepositResponse})
     } catch (err) {
         res.status(500).json({ message: "Failed to deposit money", err})
     }
@@ -157,7 +170,20 @@ export const withdrawMoney = async (req: Request, res: Response) => {
             details: "Withdrawal",
           });
         await account.save();
-        res.status(200).json({ message: "Withdrawal successful", account });
+        const accountWithdrawalResponse = {
+            address:account.address,
+            _id: account._id,
+            customerName: account.customerName,
+            email: account.email,
+            phone: account.phone,
+            balance: account.balance,
+            accountType: account.accountType,
+            createdAt: account.createdAt,
+            updatedAt: account.updatedAt,
+            transactions: account.transactions,
+            accountNumber: account.accountNumber
+        }
+        res.status(200).json({ message: "Withdrawal successful", accountWithdrawalResponse });
     } catch (err) {
         res.status(500).json({ message: "Failed to withdraw money", err})
     }
@@ -212,7 +238,6 @@ export const transferMoney = async (req: Request, res: Response) => {
             date: new Date(),
             details: `Transfer from ${fromAccount}`
           })
-
           await sender.save();
           await recipient.save();
 
