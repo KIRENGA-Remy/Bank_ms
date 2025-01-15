@@ -66,7 +66,7 @@ router.put('/account/:accountNumber/reactivate', reactivateAccount);
 
 /** 
  * @swagger
- * /accounts:
+ * /admin/accounts:
  *   get:
  *     summary: Get all accounts
  *     description: This endpoint retrieves all customer accounts from the database.
@@ -80,7 +80,7 @@ router.get('/accounts', getAllAccounts);
 
 /** 
  * @swagger
- * /account/:accountNumber/update:
+ * /admin/account/:accountNumber/update:
  *   put:
  *     summary: Update an account
  *     description: This endpoint allows updating an account based on the account number.
@@ -114,7 +114,7 @@ router.put('/account/:accountNumber/update', updateAccount);
 
 /** 
  * @swagger
- * /account/:accountNumber/transactions:
+ * /admin/account/:accountNumber/transactions:
  *   get:
  *     summary: Get account transactions
  *     description: This endpoint retrieves all transactions of a specific account.

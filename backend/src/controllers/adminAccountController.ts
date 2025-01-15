@@ -63,7 +63,7 @@ export const getAllAccounts = async (req: Request, res: Response): Promise<void>
     try {
         // Fetch accounts
         const accounts = await CustomerAccount.find()
-        res.status(200).json( accounts )
+        res.status(200).json({message: "Displaying all accounts ", accounts } )
     } catch (err) {
         res.status(500).json({ message: "Failed to fetch accounts", err})
     }
@@ -93,7 +93,24 @@ export const updateAccount = async (req: Request, res: Response): Promise<void> 
         }
 
         await updatedAccount.save()
-        res.status(200).json({ message: "Account updated successfully.", account: updatedAccount });
+
+        const updatedAccountResponse = {
+            address: account.address,
+            _id: account._id,
+            customerName: account.customerName,
+            email: account.email,
+            phone: account.phone,
+            balance: account.balance,
+            accountType: account.accountType,
+            isActive: account.isActive,
+            deactivationRequest: account.deactivationRequest,
+            reactivationRequest: account.reactivationRequest,
+            updatedAt: account.updatedAt,
+            transactions: account.transactions,
+            notifications: account.notifications,
+            accountNumber: account.accountNumber
+    }
+        res.status(200).json({ message: "Account updated successfully.", account: updatedAccountResponse });
     } catch (err) {
         console.error("Error updating account:", err);
         res.status(500).json({ message: "Failed to update account.", error: err });
