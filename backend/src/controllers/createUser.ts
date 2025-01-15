@@ -34,8 +34,9 @@ export const createUser = async (req: Request, res: Response) : Promise<void> =>
             role: newUser.role,
             picturePath: newUser.picturePath,
         }
-        res.status(201).json({ message: 'User created successfully', user: userResponse });
+        res.status(201).json({ message: 'User created successfully.', user: userResponse });
     } catch (err:  any) {
-        res.status(500).json({ message: "Failed to create a user.", err});
+        console.log("Error while registration", err);
+        res.status(500).json({ message: "Failed to create a user."});
     }
 };

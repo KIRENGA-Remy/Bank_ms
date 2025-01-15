@@ -252,7 +252,6 @@ export const exportFinancialDataAsCSV = async (req: Request, res: Response): Pro
 
         res.header("Content-Type", "text/csv");
         res.attachment("financial_data.csv");
-        res.status(200).json({ message: "Exported csv format"});
         res.send(csv);
     } catch (err) {
         console.log("Exporting csv format error", err);
