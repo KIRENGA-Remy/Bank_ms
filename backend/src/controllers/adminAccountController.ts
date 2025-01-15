@@ -206,7 +206,7 @@ export const getTransactionAnalytics = async (req: Request, res: Response): Prom
         },
       ]);
   
-      res.status(200).json({ analytics });
+      res.status(200).json({message: "Get account's financial analytics", analytics });
     } catch (err) {
       res.status(500).json({ message: "Failed to fetch transaction analytics.", err });
     }
@@ -231,6 +231,7 @@ export const getTransactionAnalytics = async (req: Request, res: Response): Prom
         customer.notifications = customer.notifications || [];
         customer.notifications.push(notification);
         await customer.save();
+        res.status(200).json({ message: "Notification sent successfully."})
     } catch (err) {
         res.status(500).json({ message: "Failed to send notification to the customer.", err})
     }
@@ -251,9 +252,11 @@ export const exportFinancialDataAsCSV = async (req: Request, res: Response): Pro
 
         res.header("Content-Type", "text/csv");
         res.attachment("financial_data.csv");
+        res.status(200).json({ message: "Exported csv format"});
         res.send(csv);
     } catch (err) {
-        res.status(500).json({ message: "Failed to export financial data as CSV", err})
+        console.log("Exporting csv format error", err);
+        res.status(500).json({ message: "Failed to export financial data as CSV"})
     }
 }
 

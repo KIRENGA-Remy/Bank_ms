@@ -137,7 +137,7 @@ router.get('/account/:accountNumber/transactions', getAccountTransactions);
 
 /** 
  * @swagger
- * /account/:accountNumber/delete-account:
+ * /admin/account/:accountNumber/delete-account:
  *   delete:
  *     summary: Delete an account
  *     description: This endpoint deletes a customer account based on the account number.
@@ -160,7 +160,7 @@ router.delete('/account/:accountNumber/delete-account', deleteAccount);
 
 /** 
  * @swagger
- * /accounts/get-financial-reports:
+ * /admin/accounts/get-financial-reports:
  *   get:
  *     summary: Get financial reports
  *     description: This endpoint generates a financial report based on account transactions (total deposits, withdrawals, transfers, and active accounts count).
@@ -174,7 +174,7 @@ router.get('/accounts/get-financial-reports', getFinancialReports);
 
 /** 
  * @swagger
- * /accounts/get-transaction-analytics:
+ * /admin/accounts/get-transaction-analytics:
  *   get:
  *     summary: Get transaction analytics
  *     description: This endpoint provides transaction analytics, including transaction types and their respective totals.
@@ -203,7 +203,7 @@ router.get('/accounts/get-transaction-analytics', getTransactionAnalytics);
 
 /** 
  * @swagger
- * /account/send-customer-notofication:
+ * /admin/account/:customerId/send-customer-notification:
  *   post:
  *     summary: Send notification to customer
  *     description: This endpoint sends a notification message to a customer.
@@ -237,7 +237,7 @@ router.post('/account/:customerId/send-customer-notification', sendCustomerNotif
 
 /** 
  * @swagger
- * /accounts/export-financial-data-csv:
+ * /admin/accounts/export-financial-data-csv:
  *   get:
  *     summary: Export financial data as CSV
  *     description: This endpoint exports financial data (e.g., customer name, balance, transactions) in CSV format.
@@ -251,7 +251,7 @@ router.get('/accounts/export-financial-data-csv', exportFinancialDataAsCSV);
 
 /** 
  * @swagger
- * /accounts/export-financial-data-pdf:
+ * /admin/accounts/export-financial-data-pdf:
  *   get:
  *     summary: Export financial data as PDF
  *     description: This endpoint exports financial data (e.g., customer name, balance, transactions) in PDF format.
