@@ -10,6 +10,7 @@ export const updateUser = async (req: Request, res: Response) : Promise<void> =>
         const user = await User.findById(id);
         if (!user) {
             res.status(404).json({ error: 'User not found' });
+            return;
         }
 
         if (password) {

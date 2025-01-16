@@ -17,26 +17,43 @@ const router = express.Router();
  *     description: Registers a new user in the system.
  *     requestBody:
  *       required: true
- *     content:
- *       application/json:
- *       schema:
- *         type: object
- *         properties:
- *           firstname:
- *             type: string
- *           lastname: 
- *             type: string
- *           email: 
- *             type: string
- *           password:
- *             type: string        
- *           role:
- *             type: string
- *           picturePath:
- *             type: string 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstname:
+ *                 type: string
+ *               lastname: 
+ *                 type: string
+ *               email: 
+ *                 type: string
+ *               password:
+ *                 type: string        
+ *               role:
+ *                 type: string
+ *               picturePath:
+ *                 type: string 
  *     responses:
- *       201: 
+ *       200:
  *         description: User created successfully.
+ *         content:
+ *           application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               _id:
+ *                 type: string
+ *               firstname:
+ *                 type: string
+ *               lastname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               picturePath:
+ *                 type: string
  *       400:
  *         description: User already exist.
  *       500:
@@ -82,6 +99,25 @@ router.post('/login', loginUser);
  *     responses:
  *       200:
  *         description: List of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               users:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   firstname:
+ *                     type: string
+ *                   lastname:
+ *                     type:string
+ *                   email:
+ *                     type: string
+ *                   role:
+ *                     type: string
+ *                   picturePath:
+ *                     type: string
  *       500:
  *         description: Failed to fetch users.
  */
@@ -97,11 +133,30 @@ router.get('/', getAllUsers);
  *       - in: path
  *         name: id
  *         required: true
+ *         description: The user id to retrieve a user.
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: User details.
+ *         description: User details retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   _id:
+ *                     type: string
+ *                   firstname:
+ *                     type: string
+ *                   lastname:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   role:
+ *                     type: string
+ *                   picturePath:
+ *                     type: string
  *       404:
  *         description: User not found.
  *       500:
@@ -143,6 +198,25 @@ router.get('/:id', getUserById);
  *     responses:
  *       200:
  *         description: User updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id: 
+ *                   type: string
+ *                 firstname:
+ *                   type: string
+ *                 lastname:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 password:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 picturePath:
+ *                   type: string
  *       404:
  *         description: User not found.
  *       500:

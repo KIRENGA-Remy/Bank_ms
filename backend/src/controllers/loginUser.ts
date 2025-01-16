@@ -41,6 +41,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
             },
         });
     } catch (err) {
-        res.status(500).json({ message: "Failed to login.",err });
+        console.log("Error while logging in", err);
+        res.status(500).json({ message: "Failed to login." });
     }
 };
