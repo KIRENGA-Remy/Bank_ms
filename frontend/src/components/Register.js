@@ -1,6 +1,18 @@
 import { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  TextInput, 
+  TouchableWithoutFeedback, 
+  Keyboard, 
+  Pressable,
+  Alert,
+  Dimensions
+} from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
+
+const { width, height} = Dimensions.get('window')
 
 export default function Register(){
     const [firstname, setFirstname] = useState('')
@@ -9,6 +21,8 @@ export default function Register(){
     const [password, setPassword] = useState('')
     const [role, setRole] = useState('')
     const [picturePath, setPicturePath] = useState('')
+
+    const [isHovered, setIsHovered] = useState(false)
 
     const handlePicturePath = async () => {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -22,9 +36,38 @@ export default function Register(){
       }
     };
 
-    const handleSubmit = () => {
-        // Logic for submitting the registration form
-        console.log({ firstname, lastname, email, password, role, picturePath })
+    const handleSubmit = async (e) => {
+      e.preventDefault()
+         if (firstname == '' || lastname == '' || email == '' || password == '' || role == '' || picturePath == ''){
+          alert('Please, fill all required fields!')
+         }
+         try {
+          const response = await fetch('http://localhost:4321/users/register',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              firstname, 
+              lastname, 
+              email, 
+              password, 
+              role, 
+              picturePath
+            })
+           })
+          const dataRes = await response.json();
+          if (dataRes.ok){
+            Alert.alert(dataRes.message || 'User registered successfully')
+            return;
+          } else {
+            Alert.alert('Error', dataRes.message || "Failed to register user")
+          }
+          
+         } catch (err) {
+          console.error('Error during registration:', err)
+          Alert.alert('Error', 'An unexpected error occurred.');
+         }
     }
 
     return (
@@ -65,6 +108,21 @@ export default function Register(){
               { picturePath ? "Change Picture" : "Upload Picture"}
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.registerButton} onPress={handleSubmit}>
+            <Text style={styles.registerButtonText}>Register</Text>
+          </TouchableOpacity>
+          <View style={styles.loginNavigation}>
+            Already have an account?
+            <Pressable 
+            onPress={() => console.log('Link Pressed')}
+            onPressIn={() => setIsHovered(true)}
+            onPressOut={() => setIsHovered(false)}
+            >
+            <Text style={[styles.loginLink, isHovered && styles.hoverEffect]}>
+              Login
+            </Text>
+            </Pressable>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     )
@@ -76,9 +134,9 @@ export default function Register(){
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#e1e1e1',
-      width:"100vw",
-      height: "100vh",
-      padding:46
+      width: width,
+      height: height,
+      padding: 46
     },
     title: {
       color: '#000',
@@ -89,6 +147,7 @@ export default function Register(){
       textAlign: 'center'
     },
     input: {
+      width: '100%',
       backgroundColor: '#fff',
       borderColor: '#f0fff8',
       borderRadius: 8,
@@ -96,20 +155,56 @@ export default function Register(){
       marginTop: 24,
       padding: 12,
       color: '#000',
-      fontSize:24
+      fontSize: 24
     },
     uploadButton: {
-      width: "100%",
-      backgroundColor: '#00FF7B',
-      padding: 16,
+      backgroundColor: '#aaa',
       marginTop: 24,
+      padding: 12,
       borderRadius: 8,
-      marginHorizontal: 20
+      marginHorizontal: 20,
+      width: '100%'
     },
     uploadImage: {
-      color: '#000',
+      width: '100%',
+      color: '#fff',
+      opacity: 0.9,
       fontWeight: 'bold',
       fontSize: 24,
       textAlign: 'center',
+    },
+    registerButton: {
+      width: '100%',
+      borderWidth: 1,
+      borderColor: '#000',
+      backgroundColor: '#4CAF50',
+      marginTop: 32,
+      marginBottom: 24,
+      borderRadius: 8
+    },
+    registerButtonText: {
+      textAlign: 'center',
+      color: '#fff',
+      fontSize: 28,
+      fontWeight: '700',
+      padding: 8
+    },
+    loginNavigation:{
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 2,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '500',
+    color: '#000'
+    },
+    loginLink: {
+      fontSize: 28,
+      fontWeight: '600',
+      color: '#000',
+    },
+    hoverEffect: {
+      textDecorationLine: 'underline', 
     },
   })
