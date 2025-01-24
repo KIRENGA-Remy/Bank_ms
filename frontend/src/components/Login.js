@@ -7,20 +7,22 @@ import {
   TouchableOpacity,
   Pressable, 
   Alert,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
-const {width, height } = Dimensions.get('window') 
+const { width, height } = Dimensions.get('window') 
 
 export default function Login(){
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
   const [isHovered, setIsHovered] = useState(false)
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
-    if (email == '' || password == ''){
+    if (!email.trim() || !password.trim()){
       Alert.alert('Email and Password are required fields!')
       return;
     }
@@ -36,12 +38,14 @@ export default function Login(){
         },
         body: JSON.stringify({ email,password })
       })
-      const dataRes = await response.json();
-      if (dataRes.ok) {
-        Alert.alert('Success', dataRes.message || 'Login successfully');
-      } else {
-        Alert.alert('Error', dataRes.message || 'Failed to login user');
+      if (!response.ok) {
+        const errorData = await response.json()
+        Alert.alert('Error', errorData.message || 'Failed to login user');
+        return;
       }
+      const dataRes = await response.json()
+      Alert.alert('Success', dataRes.message || 'Login successfully');
+      navigation.navigate('Home')
     } catch (err) {
       console.error('Error logging in:', err);
       Alert.alert('Error', 'Unable to connect to the server. Please check your network connection.');
@@ -49,7 +53,11 @@ export default function Login(){
   }
   return (
     <TouchableWithoutFeedback>
-    <View style={styles.container}>
+    <ScrollView
+    style={{backgroundColor: '#e1e1e1', flex: 1}}
+    contentContainerStyle={styles.container}
+    >
+    <View>
       <Text style={styles.title}>Login</Text>
       <TextInput 
       placeholder='Enter your email'
@@ -70,28 +78,31 @@ export default function Login(){
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin} accessibilityLabel="Login Button">
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.registerLink}>
-        Don't have an account?
-      <Pressable
-      onPress={() => console.log('Link Pressed')}
-      onPressIn={() => setIsHovered(true)}
-      onPressOut={() => setIsHovered(false)}>
-        <Text style={[styles.registerLinkText, isHovered && styles.hoverEffect]}>
-          Register
-        </Text>
-      </Pressable>
-      </TouchableOpacity>
+      <View style={styles.registerLink}>
+  <Text style={styles.registerText}>
+    Don't have an account?{' '}
+  </Text>
+  <Pressable
+    onPress={() => navigation.navigate('Register')}
+    onPressIn={() => setIsHovered(true)}
+    onPressOut={() => setIsHovered(false)}
+  >
+    <Text style={[styles.registerLinkText, isHovered && styles.hoverEffect]}>
+      Register
+    </Text>
+  </Pressable>
+</View>
+
     </View>
+    </ScrollView>
     </TouchableWithoutFeedback>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#e1e1e1',
     width: width,
     height: height,
     padding: 46
@@ -116,33 +127,37 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     width:"100%",
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
     backgroundColor: '#4CAF50',
-    margin: 24,
+    marginTop: 40,
+    marginBottom: 24,
     borderRadius: 8
   },
   loginButtonText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
-    padding: 12
+    padding: 8
   },
   registerLink: {
-    display: 'flex',
-    flexDirection: 'row',
-    color: '#000',
-    fontSize: 16,
+    flexDirection: 'row', 
+    justifyContent: 'center',
+    alignItems: 'center', 
+    marginTop: 16, 
+  },
+  registerText: {
+    fontSize: 16, 
+    color: '#555', 
     fontWeight: '500',
-    gap:2,
-    flexWrap: 'nowrap'
   },
   registerLinkText: {
+    fontSize: 16, 
+    color: '#444', 
     fontWeight: '700',
-    fontSize: 20
   },
   hoverEffect: {
-    textDecorationLine: 'underline'
-  }
+    textDecorationLine: 'underline',
+  },
 })

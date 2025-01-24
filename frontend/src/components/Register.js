@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { View, 
+import { 
+  View, 
   Text, 
   StyleSheet, 
   TouchableOpacity, 
@@ -8,9 +9,11 @@ import { View,
   Keyboard, 
   Pressable,
   Alert,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
+import { useNavigation } from '@react-navigation/native'
 
 const { width, height} = Dimensions.get('window')
 
@@ -23,6 +26,7 @@ export default function Register(){
     const [picturePath, setPicturePath] = useState('')
 
     const [isHovered, setIsHovered] = useState(false)
+    const navigation = useNavigation();
 
     const handlePicturePath = async () => {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -38,7 +42,7 @@ export default function Register(){
 
     const handleSubmit = async (e) => {
       e.preventDefault()
-         if (firstname == '' || lastname == '' || email == '' || password == '' || role == '' || picturePath == ''){
+         if (!firstname.trim() || !lastname.trim() || !email.trim() || !password.trim() || !role.trim()){
           alert('Please, fill all required fields!')
          }
          try {
@@ -53,17 +57,17 @@ export default function Register(){
               email, 
               password, 
               role, 
-              picturePath
+              picturePath: picturePath || null
             })
            })
-          const dataRes = await response.json();
-          if (dataRes.ok){
-            Alert.alert(dataRes.message || 'User registered successfully')
-            return;
-          } else {
-            Alert.alert('Error', dataRes.message || "Failed to register user")
+          if (!response.ok){
+            const errorData = await response.json();
+            Alert.alert('Error', errorData.message || "Failed to register user")
           }
-          
+          const dataRes = await response.json();
+          Alert.alert(dataRes.message || 'User registered successfully')
+          navigation.navigate('Login');
+          return;
          } catch (err) {
           console.error('Error during registration:', err)
           Alert.alert('Error', 'An unexpected error occurred.');
@@ -72,7 +76,10 @@ export default function Register(){
 
     return (
       <TouchableWithoutFeedback>
-        <View style={styles.container}>
+        <ScrollView 
+        style={{ backgroundColor: '#e1e1e1', flex: 1 }}
+        contentContainerStyle={styles.container}>
+        <View>
           <Text style={styles.title}>Register</Text>
           <TextInput 
           placeholder='Enter your first name'
@@ -81,6 +88,7 @@ export default function Register(){
           onChangeText={(text) => setFirstname(text)}
           style={styles.input}
           />
+          
           <TextInput 
           placeholder='Enter your last name'
           placeholderTextColor={'#ccc'}
@@ -97,6 +105,14 @@ export default function Register(){
           keyboardType='email-address'
           />
           <TextInput 
+          placeholder='Enter your Password'
+          placeholderTextColor={'#ccc'}
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          style={styles.input}
+          secureTextEntry={true}
+          />
+          <TextInput 
           placeholder='Select Role'
           placeholderTextColor={'#ccc'}
           value={role}
@@ -108,32 +124,35 @@ export default function Register(){
               { picturePath ? "Change Picture" : "Upload Picture"}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.registerButton} onPress={handleSubmit}>
-            <Text style={styles.registerButtonText}>Register</Text>
+          <TouchableOpacity style={styles.registerButton} onPress={handleSubmit} accessibilityLabel="Register Button">
+            <Text style={styles.registerButtonText}>
+              Register
+            </Text>
           </TouchableOpacity>
-          <View style={styles.loginNavigation}>
-            Already have an account?
+          <View style={styles.loginLink}>
+           <Text style={styles.loginText}>
+            Already have an account? {' '}
+            </Text>
             <Pressable 
-            onPress={() => console.log('Link Pressed')}
+            onPress={() => navigation.navigate('Login')}
             onPressIn={() => setIsHovered(true)}
             onPressOut={() => setIsHovered(false)}
             >
-            <Text style={[styles.loginLink, isHovered && styles.hoverEffect]}>
+            <Text style={[styles.loginLinkText, isHovered && styles.hoverEffect]}>
               Login
             </Text>
             </Pressable>
           </View>
         </View>
+        </ScrollView>
       </TouchableWithoutFeedback>
     )
   }
 
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       alignItems: 'center',
-      backgroundColor: '#e1e1e1',
       width: width,
       height: height,
       padding: 46
@@ -149,7 +168,7 @@ export default function Register(){
     input: {
       width: '100%',
       backgroundColor: '#fff',
-      borderColor: '#f0fff8',
+      borderColor: '#333',
       borderRadius: 8,
       borderWidth: 1,
       marginTop: 24,
@@ -159,16 +178,13 @@ export default function Register(){
     },
     uploadButton: {
       backgroundColor: '#aaa',
-      marginTop: 24,
+      marginVertical: 24,
       padding: 12,
       borderRadius: 8,
-      marginHorizontal: 20,
-      width: '100%'
+      borderWidth: 1,
     },
     uploadImage: {
-      width: '100%',
       color: '#fff',
-      opacity: 0.9,
       fontWeight: 'bold',
       fontSize: 24,
       textAlign: 'center',
@@ -178,7 +194,7 @@ export default function Register(){
       borderWidth: 1,
       borderColor: '#000',
       backgroundColor: '#4CAF50',
-      marginTop: 32,
+      marginTop: 40,
       marginBottom: 24,
       borderRadius: 8
     },
@@ -189,17 +205,18 @@ export default function Register(){
       fontWeight: '700',
       padding: 8
     },
-    loginNavigation:{
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 2,
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: '500',
-    color: '#000'
-    },
     loginLink: {
+      flexDirection: 'row', 
+      justifyContent: 'center',
+      alignItems: 'center', 
+      marginTop: 16, 
+    },
+    loginText: {
+      fontSize: 16, 
+      color: '#555', 
+      fontWeight: '500',
+    },
+    loginLinkText: {
       fontSize: 28,
       fontWeight: '600',
       color: '#000',

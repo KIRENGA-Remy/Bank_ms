@@ -6,6 +6,7 @@ import adminAccountRoutes from './routes/adminAccountRoutes'
 import { config } from 'dotenv';
 import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
 import { v4 as uuidv4 } from 'uuid';
+import cors from 'cors'
 
 config()
 
@@ -16,6 +17,12 @@ connectDB();
 
 // Serve Swagger docs at /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(cors(
+    {
+        origin: 'http://localhost:8081',
+        methods: ['POST','GET','PATCH','PUT','DELETE']
+    }
+))
 
 // Middleware
 app.use(express.json());

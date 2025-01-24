@@ -5,7 +5,8 @@ import bcrypt from 'bcrypt';
 export const createUser = async (req: Request, res: Response) : Promise<void> => {
     try {
         const { firstname, lastname, email, password, role, picturePath } = req.body;
-
+        console.log(req.body);
+        
         // Check if email already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
