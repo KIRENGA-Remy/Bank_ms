@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { useNavigation } from '@react-navigation/native'
+import { Picker } from '@react-native-picker/picker';
 
 const { width, height} = Dimensions.get('window')
 
@@ -112,13 +113,24 @@ export default function Register(){
           style={styles.input}
           secureTextEntry={true}
           />
-          <TextInput 
+          {/* <TextInput 
           placeholder='Select Role'
           placeholderTextColor={'#ccc'}
           value={role}
           onChangeText={(text) => setRole(text)}
           style={styles.input}
-          />
+          /> */}
+
+          <Picker
+          selectedValue={role}
+          onValueChange={(value) => setRole(value)}
+          style={styles.selectRole}
+          >
+            <Picker.Item label='Select role' value={''} />
+            <Picker.Item label='Customer' value={'Customer'} />
+            <Picker.Item label='Admin' value={'Admin'} />
+            <Picker.Item label='Teller' value={'Teller'} />
+          </Picker>
           <TouchableOpacity onPress={handlePicturePath} style={styles.uploadButton}>
             <Text style={styles.uploadImage}>
               { picturePath ? "Change Picture" : "Upload Picture"}
@@ -175,6 +187,17 @@ export default function Register(){
       padding: 12,
       color: '#000',
       fontSize: 24
+    },
+    selectRole : {
+      width: '100%',
+      borderWidth:1,
+      borderColor: '#333',
+      color: '#ccc',
+      fontSize: 24,
+      marginTop: 24,
+      padding: 12,
+      backgroundColor: '#fff',
+      borderRadius: 8
     },
     uploadButton: {
       backgroundColor: '#aaa',

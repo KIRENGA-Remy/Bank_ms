@@ -45,7 +45,7 @@ export default function Login(){
       }
       const dataRes = await response.json()
       Alert.alert('Success', dataRes.message || 'Login successfully');
-      navigation.navigate('Home')
+      navigation.navigate('Dashboard')
     } catch (err) {
       console.error('Error logging in:', err);
       Alert.alert('Error', 'Unable to connect to the server. Please check your network connection.');
