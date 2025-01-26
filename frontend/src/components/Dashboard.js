@@ -1,11 +1,64 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons' 
 import { ScrollView } from 'react-native-gesture-handler'
+import { PieChart } from 'react-native-chart-kit'
 
 export default function Dashboard(){
+    const [financialData, setFinancialData] = useState({
+        totalDeposits: 0,
+        totalWithdrawals: 0,
+        totalTransfers: 0
+    })
+
+    const fetchFinancialReport = async () => {
+        try {
+            const response = await fetch('http://localhost:4321/admin/accounts/get-financial-reports')
+            if(!response.ok){
+                Alert.alert("Failed to fetch financial report")
+                return;
+            }
+            const dataRes = await response.json()
+            setFinancialData({
+                totalDeposits: dataRes.totalDeposits,
+                totalWithdrawals: dataRes.totalWithdrawals,
+                totalTransfers: dataRes.totalTransfers
+            })
+        } catch (err) {
+            Alert.alert("Error", "Failed to fetch financial reports")
+        }
+    }
+
+    useEffect(() =>{
+        fetchFinancialReport()
+    },[])
+
+    const pieChartData = [
+        {
+            name: 'Deposits',
+            population: financialData.totalDeposits,
+            color: '#FF7F50',
+            legendFontColor: '#7F7F7F',
+            legendFontSize: 15
+        },
+        {
+            name: 'Withdrawals',
+            population: financialData.totalWithdrawals,
+            color: '#00BFFF',
+            legendFontColor: '#7F7F7F',
+            legendFontSize: 15
+        },
+        {
+            name: 'Transfers',
+            population: financialData.totalTransfers,
+            color: '#32CD32',
+            legendFontColor: '#7F7F7F',
+            legendFontSize: 15
+        }
+    ];
+    
   return (
     <SafeAreaView style={styles.container}>
         {/* Header */}
@@ -29,6 +82,28 @@ export default function Dashboard(){
                         <Text style={styles.cardValue}>678</Text>
                     </View>
                 </View>
+                <View>
+                    <Text style={styles.financialTransactionsTitle}>Financial transactions</Text>
+                    <View>
+                        <PieChart 
+                        data={pieChartData}
+                        width={300}
+                        height={220}
+                        chartConfig={{
+                            backgroundColor: '#fff',
+                            backgroundGradientFrom: '#fff',
+                            backgroundGradientTo: '#fff',
+                            color: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
+                            style:{
+                                borderRadius: 16
+                            }
+                        }}
+                        accessor='population'
+                        backgroundColor='transparent'
+                        paddingLeft='15' 
+                        />
+                    </View>
+                </View>
             </ScrollView>
     </SafeAreaView>
   )
@@ -43,13 +118,13 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginVertical: 2,
+        alignItems: 'center',
         backgroundColor: '#fff',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: 16
-    },
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc'
+    },    
     title: {
         fontWeight: 'bold',
         fontSize: 20
@@ -82,5 +157,11 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: 20,
         fontWeight: '300'
+    },
+    financialTransactionsTitle:{
+        fontWeight: '700',
+        paddingVertical: 20,
+        paddingHorizontal: 8,
+        fontSize: 20
     }
 })
