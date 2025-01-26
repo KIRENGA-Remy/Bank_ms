@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text } from 'react-native'
 import React from 'react'
+import { StyleSheet } from 'react-native'
 
-export default function UsersPage(){
+export default function Customers(){
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>UsersPage</Text>
+      <Text style={styles.title}>Customers</Text>
     </View>
   )
 }

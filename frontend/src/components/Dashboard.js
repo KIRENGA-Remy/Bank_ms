@@ -101,7 +101,9 @@ export default function Dashboard(){
         {/* Header */}
         <View style={styles.header}>
             <Text style={styles.title}>Admin Dashboard</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+            onPress={() => navigation.navigate('YourNotifications')}
+            >
                 <Ionicons name='notifications' size={24} color={'black'} />
             </TouchableOpacity>
         </View>
@@ -112,14 +114,14 @@ export default function Dashboard(){
                 <View style={styles.cardsContainer}>
                     <TouchableOpacity 
                     style={styles.card}
-                    onPress={() => navigation.navigate('UsersPage')}
+                    onPress={() => navigation.navigate('Users')}
                     >
                         <Text style={styles.cardTitle}>Users</Text>
                         <Text style={styles.cardValue}>{users.length}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                     style={styles.card}
-                    onPress={() => navigation.navigate('CustomersPage')}
+                    onPress={() => navigation.navigate('Customers')}
                     >
                         <Text style={styles.cardTitle}>Customers</Text>
                         <Text style={styles.cardValue}>{customers.length}</Text>

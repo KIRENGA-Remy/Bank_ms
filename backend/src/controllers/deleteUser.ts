@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import User from '../models/userModel'; 
-import bcrypt from 'bcrypt';
 
 export const deleteUser = async (req: Request, res: Response) : Promise<void> => {
     try {

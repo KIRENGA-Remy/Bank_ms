@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window') 
 
@@ -44,6 +45,7 @@ export default function Login(){
         return;
       }
       const dataRes = await response.json()
+      await AsyncStorage.setItem('authToken', dataRes.token)
       Alert.alert('Success', dataRes.message || 'Login successfully');
       navigation.navigate('Dashboard')
     } catch (err) {

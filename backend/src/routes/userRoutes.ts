@@ -5,6 +5,9 @@ import { getUserById } from '../controllers/getUserById'
 import { updateUser } from '../controllers/updateUser'
 import { deleteUser } from '../controllers/deleteUser'
 import { loginUser } from '../controllers/loginUser'
+import { getNotifications } from '../controllers/getNotifications';
+import { markNotificationAsRead } from '../controllers/notificationRead';
+import { authenticate } from '../middleware/authMiddleware'
 
 const router = express.Router();
 
@@ -34,6 +37,20 @@ const router = express.Router();
  *                 type: string
  *               picturePath:
  *                 type: string 
+ *               notifications:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     message:
+ *                       type: string
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     isRead:
+ *                       type: boolean
  *     responses:
  *       200:
  *         description: User created successfully.
@@ -54,6 +71,20 @@ const router = express.Router();
  *                 type: string
  *               picturePath:
  *                 type: string
+ *               notifications:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     message:
+ *                       type: string
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     isRead:
+ *                       type: boolean
  *       400:
  *         description: User already exist.
  *       500:
@@ -118,6 +149,20 @@ router.post('/login', loginUser);
  *                     type: string
  *                   picturePath:
  *                     type: string
+ *                   notifications:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         title:
+ *                           type: string
+ *                         message:
+ *                           type: string
+ *                         date:
+ *                           type: string
+ *                           format: date
+ *                         isRead:
+ *                           type: boolean
  *       500:
  *         description: Failed to fetch users.
  */
@@ -157,6 +202,20 @@ router.get('/', getAllUsers);
  *                     type: string
  *                   picturePath:
  *                     type: string
+ *                   notifications:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         title:
+ *                           type: string
+ *                         message:
+ *                           type: string
+ *                         date:
+ *                           type: string
+ *                           format: date
+ *                         isRead:
+ *                           type: boolean
  *       404:
  *         description: User not found.
  *       500:
@@ -195,6 +254,20 @@ router.get('/:id', getUserById);
  *                 type: string
  *               picturePath:
  *                 type: string
+ *               notifications:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     message:
+ *                       type: string
+ *                     date:
+ *                       type: string
+ *                       format: date
+ *                     isRead:
+ *                       type: boolean
  *     responses:
  *       200:
  *         description: User updated successfully.
@@ -217,6 +290,20 @@ router.get('/:id', getUserById);
  *                   type: string
  *                 picturePath:
  *                   type: string
+ *                 notifications:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       title:
+ *                         type: string
+ *                       message:
+ *                         type: string
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       isRead:
+ *                         type: boolean
  *       404:
  *         description: User not found.
  *       500:
@@ -245,5 +332,50 @@ router.put('/:id', updateUser);
  *         description: Failed to delete user.
  */
 router.delete('/:id', deleteUser);
+/**
+ * @swagger
+ * /users/notifications:
+ *   get:
+ *     summary: Get notifications
+ *     description: Get your notifications from this app.
+ *     responses:
+ *       200:
+ *         description: Notifications retrieved.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   message:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   isRead:
+ *                     type: boolean
+ *       500:
+ *         description: Failed to get notifications.
+ */
+router.get('/notifications', authenticate, getNotifications);
+
+/**
+ * @swagger
+ * /users/notifications/mark-as-read:
+ *   patch:
+ *     summary: Mark notification
+ *     description: Setting isRead of notifications to true.
+ *     responses:
+ *       200:
+ *         description: Notification marked as read successfully.
+ *       500:
+ *         description: Failed to mark notification as read.
+ */
+router.patch('/notifications/mark-as-read', authenticate, markNotificationAsRead);
 
 export default router;

@@ -1,5 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface INotifications{
+    title: string;
+    message: string;
+    date: Date;
+    isRead: boolean;
+}
 export interface IUser extends Document {
     firstname: string;
     lastname: string;
@@ -7,6 +13,7 @@ export interface IUser extends Document {
     password: string;
     role: 'Admin' | 'Teller' | 'Customer'; 
     picturePath: string;
+    notifications: INotifications[];
 }
 
 const userSchema: Schema<IUser> = new Schema(
@@ -45,7 +52,15 @@ const userSchema: Schema<IUser> = new Schema(
         picturePath: {
             type: String,
             trim: true
-        }
+        },
+        notifications: [
+            {
+                title: { type: String, required: true },
+                message: { type: String, required: true },
+                date: { type: Date, default: Date.now },
+                isRead: { type: Boolean, default: false },
+            },
+        ],
     },
     {
         timestamps: true, 
