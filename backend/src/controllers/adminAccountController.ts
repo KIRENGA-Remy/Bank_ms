@@ -3,6 +3,7 @@ import { CustomerAccount } from '../models/customerAccount';
 import { Parser } from 'json2csv';
 import PDFDocument from 'pdfkit'
 
+
 // Admin deactivates account
 export const deactivateAccount = async (req: Request, res: Response): Promise<void> => {
     try {

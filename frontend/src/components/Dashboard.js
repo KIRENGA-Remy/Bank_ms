@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import {View, Text, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons' 
 import { ScrollView } from 'react-native-gesture-handler'
 import { PieChart } from 'react-native-chart-kit'
+import { useNavigation } from '@react-navigation/native'
 
 export default function Dashboard(){
     const [financialData, setFinancialData] = useState({
@@ -12,6 +13,40 @@ export default function Dashboard(){
         totalWithdrawals: 0,
         totalTransfers: 0
     })
+    const [users, setUsers] = useState([]);
+    const [customers, setCustomers] = useState([]);
+
+    const navigation = useNavigation()
+
+    const fetchAllUsers = async () => {
+        try {
+            const response = await fetch('http://localhost:4321/users')
+            if(!response.ok){
+                Alert.alert("Error", "Failed to get all users")
+                return;
+            }
+            const dataRes = await response.json();
+            const retrievedUsers = dataRes.users;
+            setUsers(retrievedUsers)
+        } catch (err) {
+            Alert.alert('Error', err.message);
+        }
+    }
+
+    const fetchAllCustomers = async () => {
+        try {
+            const response = await fetch('http://localhost:4321/admin/accounts')
+            if(!response.ok){
+                Alert.alert("Error", "Failed to get all customers")
+                return;
+            }
+            const dataRes = await response.json();
+            const accounts = dataRes.accounts;
+            setCustomers(accounts)
+        } catch (err) {
+            Alert.alert('Error', err.message);
+        }
+    }
 
     const fetchFinancialReport = async () => {
         try {
@@ -27,12 +62,14 @@ export default function Dashboard(){
                 totalTransfers: dataRes.totalTransfers
             })
         } catch (err) {
-            Alert.alert("Error", "Failed to fetch financial reports")
+            Alert.alert('Error', err.message);
         }
     }
 
     useEffect(() =>{
         fetchFinancialReport()
+        fetchAllCustomers()
+        fetchAllUsers()
     },[])
 
     const pieChartData = [
@@ -73,14 +110,20 @@ export default function Dashboard(){
             contentContainerStyle={styles.contentScroll}
             >
                 <View style={styles.cardsContainer}>
-                    <View style={styles.card}>
+                    <TouchableOpacity 
+                    style={styles.card}
+                    onPress={() => navigation.navigate('UsersPage')}
+                    >
                         <Text style={styles.cardTitle}>Users</Text>
-                        <Text style={styles.cardValue}>123</Text>
-                    </View>
-                    <View style={styles.card}>
+                        <Text style={styles.cardValue}>{users.length}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                    style={styles.card}
+                    onPress={() => navigation.navigate('CustomersPage')}
+                    >
                         <Text style={styles.cardTitle}>Customers</Text>
-                        <Text style={styles.cardValue}>678</Text>
-                    </View>
+                        <Text style={styles.cardValue}>{customers.length}</Text>
+                    </TouchableOpacity>
                 </View>
                 <View>
                     <Text style={styles.financialTransactionsTitle}>Financial transactions</Text>

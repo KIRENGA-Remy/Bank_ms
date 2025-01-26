@@ -7,7 +7,7 @@ export const getAllUsers = async (req: Request, res: Response):Promise<void> => 
         res.status(200).json({
             success: true,
             message: "Users fetched successfully.",
-            data: users
+            users
         });
     } catch (err) {
         console.log("Error while getting all users.", err);
