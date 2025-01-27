@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import userModel, { IUser } from "../models/userModel";
+import { CustomerAccount } from "../models/customerAccount";
 
 export interface CustomUserIdRequest extends Request {
     user?: {
@@ -13,26 +13,26 @@ export const getNotifications = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const userId = req.user?.id;
+        const customerId = req.user?.id;
 
-        if (!userId) {
+        if (!customerId) {
             res.status(403).json({ message: "You're required to login" });
             return;
         }
 
-        const user = await userModel.findById(userId).select('notifications') as IUser | null;
+        const customer = await CustomerAccount.findById(customerId).select('notifications');
 
-        if (!user) {
-            res.status(404).json({ message: "User not found" });
+        if (!customer) {
+            res.status(404).json({ message: "Customer not found" });
             return;
         }
 
-        const unreadNotifications = user.notifications.filter(
+        const unreadNotifications = customer.notifications.filter(
             (notification) => !notification.isRead
         );
 
         res.status(200).json({
-            notifications: user.notifications,
+            notifications: customer.notifications,
             unreadCount: unreadNotifications.length,
         });
     } catch (err) {

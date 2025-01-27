@@ -12,7 +12,8 @@ const TransactionSchema = new Schema({
 const NotificationSchema = new Schema({
   title: { type: String, required: true },
   message: { type: String, required: true },
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now },
+  isRead: { type: Boolean, default: false}
 });
 
 const CustomerAccountSchema = new Schema({
@@ -78,6 +79,7 @@ export interface ICustomerAccount extends Document {
     title: string;
     message: string;
     date: Date;
+    isRead: Boolean;
   }[];
 }
 

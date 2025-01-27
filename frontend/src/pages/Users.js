@@ -1,10 +1,16 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 export default function Users(){
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Users</Text>
+      <Text style={styles.title}>Available users...</Text>
+      <View style={styles.allUsers}>
+        <TouchableOpacity>
+
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -18,5 +24,6 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold'
-    }
+    },
+    allUsers:{}
 })

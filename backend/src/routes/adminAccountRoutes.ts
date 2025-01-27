@@ -13,6 +13,9 @@ import {
     exportFinancialDataAsCSV,
     exportFinancialDataAsPDF
  } from '../controllers/adminAccountController';
+import { authenticate } from '../middleware/authMiddleware';
+import { markNotificationAsRead } from '../controllers/notificationRead';
+import { getNotifications } from '../controllers/getNotifications';
 
 const router = express.Router();
 
@@ -234,6 +237,52 @@ router.get('/accounts/get-transaction-analytics', getTransactionAnalytics);
  *         description: Failed to send notification due to an internal error.
  */
 router.post('/account/:customerId/send-customer-notification', sendCustomerNotification);
+
+/**
+ * @swagger
+ * /users/notifications:
+ *   get:
+ *     summary: Get notifications
+ *     description: Get your notifications from this app.
+ *     responses:
+ *       200:
+ *         description: Notifications retrieved.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   message:
+ *                     type: string
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   isRead:
+ *                     type: boolean
+ *       500:
+ *         description: Failed to get notifications.
+ */
+router.get('/notifications', authenticate, getNotifications);
+
+/**
+ * @swagger
+ * /users/notifications/mark-as-read:
+ *   patch:
+ *     summary: Mark notification
+ *     description: Setting isRead of notifications to true.
+ *     responses:
+ *       200:
+ *         description: Notification marked as read successfully.
+ *       500:
+ *         description: Failed to mark notification as read.
+ */
+router.patch('/notifications/mark-as-read', authenticate, markNotificationAsRead);
 
 /** 
  * @swagger

@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { CustomerAccount } from '../models/customerAccount';
 import { Parser } from 'json2csv';
 import PDFDocument from 'pdfkit'
+import mongoose from 'mongoose';
 
 
 // Admin deactivates account
@@ -227,7 +228,8 @@ export const getTransactionAnalytics = async (req: Request, res: Response): Prom
         const notification = {
             title,
             message,
-            date: new Date()
+            date: new Date(),
+            isRead: false
         }
         customer.notifications = customer.notifications || [];
         customer.notifications.push(notification);

@@ -72,6 +72,7 @@ export default function Dashboard(){
         fetchAllUsers()
     },[])
 
+    console.log(customers);
     const pieChartData = [
         {
             name: 'Deposits',
@@ -95,7 +96,7 @@ export default function Dashboard(){
             legendFontSize: 15
         }
     ];
-    
+
   return (
     <SafeAreaView style={styles.container}>
         {/* Header */}
