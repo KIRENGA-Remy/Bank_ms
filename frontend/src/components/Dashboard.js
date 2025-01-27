@@ -72,7 +72,6 @@ export default function Dashboard(){
         fetchAllUsers()
     },[])
 
-    console.log(customers);
     const pieChartData = [
         {
             name: 'Deposits',
@@ -122,7 +121,7 @@ export default function Dashboard(){
                     </TouchableOpacity>
                     <TouchableOpacity 
                     style={styles.card}
-                    onPress={() => navigation.navigate('Customers')}
+                    onPress={() => navigation.navigate('Customers', { customers })}
                     >
                         <Text style={styles.cardTitle}>Customers</Text>
                         <Text style={styles.cardValue}>{customers.length}</Text>

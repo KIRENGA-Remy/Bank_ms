@@ -7,6 +7,7 @@ import { config } from 'dotenv';
 import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors'
+import cookieParser from 'cookie-parser';
 
 config()
 
@@ -25,7 +26,9 @@ app.use(cors(
 ))
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit:'30mb' }));
+app.use(cookieParser());
+app.use(express.urlencoded({ limit: '30mb', extended: true }));
 app.get('/', (req: Request, res: Response) => {
     res.send("APP is running");
 });

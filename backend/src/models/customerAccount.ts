@@ -27,6 +27,7 @@ const CustomerAccountSchema = new Schema({
     state: { type: String },
     postalCode: { type: String }
   },
+  picturePath: { type: String},
   balance: { type: Number, required: true, default: 0 },
   accountType: { type: String, required: true, enum: ["Savings", "Current", "Business"] },
   createdAt: { type: Date, default: Date.now },
@@ -81,6 +82,7 @@ export interface ICustomerAccount extends Document {
     date: Date;
     isRead: Boolean;
   }[];
+  picturePath: string
 }
 
 export const CustomerAccount = model<ICustomerAccount>("CustomerAccount", CustomerAccountSchema);

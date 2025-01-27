@@ -15,7 +15,8 @@ interface CreateAccountRequest {
         city?: string;
         state?: string;
         postalCode?: string
-    }
+    },
+    picturePath: string
 }
 
 export const createAccount = async (req: Request, res: Response) => {
@@ -26,7 +27,8 @@ export const createAccount = async (req: Request, res: Response) => {
             phone, 
             address, 
             accountType, 
-            password 
+            password ,
+            picturePath
         } = req.body as CreateAccountRequest;
 
         // Validate required fields
@@ -66,7 +68,8 @@ export const createAccount = async (req: Request, res: Response) => {
                 state: address?.state || "",
                 postalCode: address?.postalCode || "",
               },
-            accountType
+            accountType,
+            picturePath
         })
         await newAccount.save();
         const responseAccount = {
@@ -76,7 +79,8 @@ export const createAccount = async (req: Request, res: Response) => {
             phone: newAccount.phone,
             address: newAccount.address,
             accountType: newAccount.accountType,
-            balance: newAccount.balance
+            balance: newAccount.balance,
+            picturePath: newAccount.picturePath
         }
         res.status(200).json({ message: "Account created successfully", account: responseAccount})
 
