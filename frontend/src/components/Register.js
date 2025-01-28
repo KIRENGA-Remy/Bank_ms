@@ -10,12 +10,14 @@ import {
   Pressable,
   Alert,
   Dimensions,
-  ScrollView
+  ScrollView,
+  Image,
+  Platform
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { useNavigation } from '@react-navigation/native'
 import { Picker } from '@react-native-picker/picker';
-
+import { launchImageLibrary } from '@react-native-picker/picker'
 const { width, height} = Dimensions.get('window')
 
 export default function Register(){
@@ -29,50 +31,77 @@ export default function Register(){
     const [isHovered, setIsHovered] = useState(false)
     const navigation = useNavigation();
 
-    const handlePicturePath = async () => {
+    const handleImageUpload = async () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        quality: 1,
-      });
-    
-      if (!result.canceled) {
-        setPicturePath(result.uri);
+        aspect: [4,3],
+        quality: 1
+      })
+      if(!result.canceled){
+        setPicturePath(result.assets[0]);
       }
-    };
+    }
+
+    const imageUpload = async () => {
+        const data = new FormData();
+        data.append('photo',{
+          uri: picturePath.uri,
+          name: picturePath.fileName || 'photo.jpg',
+          type: picturePath.type || 'image/jpeg'
+        })
+      try {
+        const response = await fetch('http://localhost:4321/api/upload', {
+          method: 'POST',
+          body: data,
+          headers: {
+            'Content-Type':'multipart/form-data'
+          },
+        })
+        const result = await response.json();
+        console.log("Uploading image response ", result);
+        
+      } catch (err) {
+        console.log("Error while uploading image", err);
+        Alert.alert("Failed to upload image")
+        
+      }
+    }
 
     const handleSubmit = async (e) => {
       e.preventDefault()
-         if (!firstname.trim() || !lastname.trim() || !email.trim() || !password.trim() || !role.trim()){
-          alert('Please, fill all required fields!')
-         }
-         try {
-          const response = await fetch('http://localhost:4321/users/register',{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              firstname, 
-              lastname, 
-              email, 
-              password, 
-              role, 
-              picturePath: picturePath || null
-            })
-           })
-          if (!response.ok){
-            const errorData = await response.json();
-            Alert.alert('Error', errorData.message || "Failed to register user")
-          }
-          const dataRes = await response.json();
-          Alert.alert(dataRes.message || 'User registered successfully')
-          navigation.navigate('Login');
+      try {
+        await imageUpload();
+        if(!firstname || !lastname || !email || !password || !role){
+          Alert.alert("Please fill all required fields.")
           return;
-         } catch (err) {
-          console.error('Error during registration:', err)
-          Alert.alert('Error', 'An unexpected error occurred.');
-         }
+        }
+        const response = await fetch('http://localhost:4321/users/register',{
+          method: 'POST',
+          headers: {
+            'Content-Type':'application/json'
+          },
+          body: JSON.stringify({
+            firstname,
+            lastname,
+            email,
+            role,
+            password,
+            picturePath: picturePath.uri || null
+          })
+        })
+
+        if(!response.ok){
+          const errorData = await response.json()
+          Alert.alert("Error", errorData.message || "Failed to register user")
+        }
+        const dataRes = await response.json()
+        Alert.alert("Success", dataRes.message || 'User registered successfully');
+        navigation.navigate('Login');
+      } catch (err) {
+        console.log("Error while registering", err);
+        Alert.alert('Error', 'An unexpected error occurred.'); 
+      }
     }
 
     return (
@@ -89,7 +118,6 @@ export default function Register(){
           onChangeText={(text) => setFirstname(text)}
           style={styles.input}
           />
-          
           <TextInput 
           placeholder='Enter your last name'
           placeholderTextColor={'#ccc'}
@@ -113,14 +141,6 @@ export default function Register(){
           style={styles.input}
           secureTextEntry={true}
           />
-          {/* <TextInput 
-          placeholder='Select Role'
-          placeholderTextColor={'#ccc'}
-          value={role}
-          onChangeText={(text) => setRole(text)}
-          style={styles.input}
-          /> */}
-
           <Picker
           selectedValue={role}
           onValueChange={(value) => setRole(value)}
@@ -131,12 +151,20 @@ export default function Register(){
             <Picker.Item label='Admin' value={'Admin'} />
             <Picker.Item label='Teller' value={'Teller'} />
           </Picker>
-          <TouchableOpacity onPress={handlePicturePath} style={styles.uploadButton}>
-            <Text style={styles.uploadImage}>
-              { picturePath ? "Change Picture" : "Upload Picture"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.registerButton} onPress={handleSubmit} accessibilityLabel="Register Button">
+          <View style={styles.uploadSection}>
+            <TouchableOpacity style={styles.uploadButton} onPress={handleImageUpload} >
+              <Text style={styles.uploadButtonText}>
+                { picturePath ? "Change Image" : 'Upload Image'}
+              </Text>
+            </TouchableOpacity>
+            { picturePath && (
+              <Image
+              source={{ uri: picturePath.uri }}
+              style={ styles.imagePreview}
+              />
+            )}
+          </View>
+          <TouchableOpacity style={styles.registerButton} onPress={handleSubmit}>
             <Text style={styles.registerButtonText}>
               Register
             </Text>
@@ -188,63 +216,64 @@ export default function Register(){
       color: '#000',
       fontSize: 24
     },
-    selectRole : {
-      width: '100%',
-      borderWidth:1,
-      borderColor: '#333',
-      color: '#ccc',
-      fontSize: 24,
-      marginTop: 24,
-      padding: 12,
-      backgroundColor: '#fff',
-      borderRadius: 8
-    },
-    uploadButton: {
-      backgroundColor: '#aaa',
-      marginVertical: 24,
-      padding: 12,
-      borderRadius: 8,
-      borderWidth: 1,
-    },
-    uploadImage: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 24,
-      textAlign: 'center',
-    },
-    registerButton: {
-      width: '100%',
-      borderWidth: 1,
-      borderColor: '#000',
-      backgroundColor: '#4CAF50',
-      marginTop: 40,
-      marginBottom: 24,
-      borderRadius: 8
-    },
-    registerButtonText: {
-      textAlign: 'center',
-      color: '#fff',
-      fontSize: 28,
-      fontWeight: '700',
-      padding: 8
-    },
-    loginLink: {
-      flexDirection: 'row', 
-      justifyContent: 'center',
-      alignItems: 'center', 
-      marginTop: 16, 
-    },
-    loginText: {
-      fontSize: 16, 
-      color: '#555', 
-      fontWeight: '500',
-    },
-    loginLinkText: {
-      fontSize: 28,
-      fontWeight: '600',
-      color: '#000',
-    },
-    hoverEffect: {
-      textDecorationLine: 'underline', 
-    },
-  })
+  selectRole: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#333',
+    color: '#333',
+    fontSize: 16,
+    marginTop: 24,
+    padding: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+  },
+  uploadSection: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  uploadButton: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 8,
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  imagePreview: {
+    marginTop: 12,
+    width: 150,
+    height: 150,
+    borderRadius: 8,
+  },
+  registerButton: {
+    backgroundColor: '#28a745',
+    marginTop: 24,
+    padding: 12,
+    borderRadius: 8,
+  },
+  registerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  loginLink: {
+    marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  loginText: {
+    color: '#000',
+    fontSize: 14,
+  },
+  loginLinkText: {
+    color: '#007bff',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  hoverEffect: {
+    fontWeight: 'bold',
+  },
+});

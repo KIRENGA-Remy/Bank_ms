@@ -28,8 +28,6 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               accountNumber:
- *                 type: string
  *               customerName:
  *                 type: string
  *               email:
