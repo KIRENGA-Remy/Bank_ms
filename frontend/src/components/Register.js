@@ -6,18 +6,15 @@ import {
   TouchableOpacity, 
   TextInput, 
   TouchableWithoutFeedback, 
-  Keyboard, 
   Pressable,
   Alert,
   Dimensions,
   ScrollView,
   Image,
-  Platform
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { useNavigation } from '@react-navigation/native'
 import { Picker } from '@react-native-picker/picker';
-import { launchImageLibrary } from '@react-native-picker/picker'
 const { width, height} = Dimensions.get('window')
 
 export default function Register(){

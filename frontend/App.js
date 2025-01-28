@@ -9,6 +9,7 @@ import Customers from './src/pages/Customers';
 import SendNotifications from './src/pages/SendNotifications';
 import YourNotifications from './src/pages/YourNotifications';
 import NotificationDetails from './src/pages/NotificationDetails';
+import CreateAccount from './src/pages/CreateAccount';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+      <Stack.Screen name='CreateAccount' component={CreateAccount} />
       <Stack.Screen name='Login' component={Login} />
       <Stack.Screen name='Dashboard' component={Dashboard} /> 
       <Stack.Screen name='Register' component={Register} />
