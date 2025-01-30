@@ -45,9 +45,18 @@ export default function Login(){
         return;
       }
       const dataRes = await response.json()
+      console.log(dataRes);
+      
       await AsyncStorage.setItem('authToken', dataRes.token)
       Alert.alert('Success', dataRes.message || 'Login successfully');
-      navigation.navigate('Dashboard')
+      if(dataRes.user.role === "Customer"){
+        navigation.navigate('CustomerDashboard');
+        return;
+      } else if(dataRes.user.role === "Admin") {
+        navigation.navigate('AdminDashboard');
+      } else {
+        navigation.navigate('TellerDashboard')
+      }
     } catch (err) {
       console.error('Error logging in:', err);
       Alert.alert('Error', 'Unable to connect to the server. Please check your network connection.');

@@ -7,7 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { PieChart } from 'react-native-chart-kit'
 import { useNavigation } from '@react-navigation/native'
 
-export default function Dashboard(){
+export default function AdminDashboard(){
     const [financialData, setFinancialData] = useState({
         totalDeposits: 0,
         totalWithdrawals: 0,

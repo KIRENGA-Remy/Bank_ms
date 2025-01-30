@@ -1,15 +1,21 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { FlatList } from 'react-native';
 
 export default function Customers({ route }){
   const { customers } = route.params;
-  console.log(customers);
+
+  const handleAddCustomer = () => {}
   
   return (
     <View style={styles.container}>
+      <View style={styles.customersHeader}>
       <Text style={styles.title}>Customers</Text>
+      <TouchableOpacity style={styles.addCustomer} onPress={handleAddCustomer}>
+        <Text style={styles.addCustomerText}>+</Text>
+      </TouchableOpacity>
+      </View>
       <FlatList
       data={customers}
       keyExtractor={(item) => item._id}
@@ -36,6 +42,27 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
+  },
+  customersHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center', 
+    paddingVertical: 10,  
+  },
+  addCustomer: {
+    width: 40,  
+    height: 40, 
+    backgroundColor: '#fff', 
+    borderRadius: 20, 
+    borderWidth: 1,
+    justifyContent: 'center', 
+    alignItems: 'center',  
+    elevation: 4, 
+  },
+  addCustomerText: {
+    fontWeight: 'bold',
+    fontSize: 24,
+    color: '#000', 
   },
   customerCard: {
     padding: 16,
