@@ -1,10 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
-import userRoutes from './routes/userRoutes'; 
-import connectDB from './config/db';
-import customerAccountRoutes from './routes/customerAccountRoutes'
-import adminAccountRoutes from './routes/adminAccountRoutes'
+import userRoutes from './routes/userRoutes.js'; 
+import connectDB from './config/db.js';
+import customerAccountRoutes from './routes/customerAccountRoutes.js'
+import adminAccountRoutes from './routes/adminAccountRoutes.js'
 import { config } from 'dotenv';
-import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
+import { swaggerSpec, swaggerUi } from './config/swaggerConfig.js';
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';

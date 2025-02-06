@@ -1,35 +1,33 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { StyleSheet } from 'react-native'
-import { FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, FlatList } from 'react-native';
+import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 
-export default function Customers({ route }){
+export default function Customers({ route }) {
   const { customers } = route.params;
+  const navigation = useNavigation();
 
-  const handleAddCustomer = () => {}
-  
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.customersHeader}>
-      <Text style={styles.title}>Customers</Text>
-      <TouchableOpacity style={styles.addCustomer} onPress={handleAddCustomer}>
-        <Text style={styles.addCustomerText}>+</Text>
-      </TouchableOpacity>
+        <Text style={styles.title}>Customers</Text>
+        <TouchableOpacity style={styles.addCustomer} onPress={() => navigation.navigate('CreateAccount')}>
+          <Text style={styles.addCustomerText}>+</Text>
+        </TouchableOpacity>
       </View>
       <FlatList
-      data={customers}
-      keyExtractor={(item) => item._id}
-      renderItem={({ item }) => (
-        <View style={styles.customerCard}>
+        data={customers}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View style={styles.customerCard}>
             <Text style={styles.customerName}>{item.customerName}</Text>
             <Text>Email: {item.email}</Text>
-            <Text>Phone: {item.phone}</Text>
+            {/* <Text>Phone: {item.phone}</Text> */}
             <Text>{item.accountType}</Text>
-        </View>
-      )}
-       />
-    </View>
-  )
+          </View>
+        )}
+      />
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -46,23 +44,23 @@ const styles = StyleSheet.create({
   customersHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', 
-    paddingVertical: 10,  
+    alignItems: 'center',
+    paddingVertical: 10,
   },
   addCustomer: {
-    width: 40,  
-    height: 40, 
-    backgroundColor: '#fff', 
-    borderRadius: 20, 
+    width: 40,
+    height: 40,
+    backgroundColor: '#fff',
+    borderRadius: 20,
     borderWidth: 1,
-    justifyContent: 'center', 
-    alignItems: 'center',  
-    elevation: 4, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
   },
   addCustomerText: {
     fontWeight: 'bold',
     fontSize: 24,
-    color: '#000', 
+    color: '#000',
   },
   customerCard: {
     padding: 16,

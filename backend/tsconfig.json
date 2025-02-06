@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES6",
+    "module": "esnext",
     "moduleResolution": "node",
-    "types": ["node"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
@@ -15,6 +14,6 @@
     "esm": true,
   "experimentalSpecifierResolution": "node"
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/*.ts"],
   "exclude": ["node_modules"]
 }
