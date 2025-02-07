@@ -6,10 +6,12 @@ import {
     Dimensions,
     TextInput,
     TouchableOpacity,
+    Image
   } from 'react-native';
   import React, { useState } from 'react';
   import { Picker } from '@react-native-picker/picker';
-  
+  import * as ImagePicker from 'expo-image-picker';
+  import { useNavigation } from '@react-navigation/native';
   const { width, height } = Dimensions.get('window');
   
   export default function CreateAccount() {
@@ -24,6 +26,105 @@ import {
     const [state, setState] = useState('');
     const [city, setCity] = useState('');
     const [postalCode, setPostalCode] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const navigation = useNavigation();
+
+    const handleImageUpload = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1
+        });
+
+        if (!result.canceled && result.assets.length > 0) {
+            setPicturePath(result.assets[0]);
+        }
+    };
+
+    const uploadImage = async () => {
+        if (!picturePath) return;
+        
+        const data = new FormData();
+        data.append('photo', {
+            uri: picturePath.uri,
+            name: picturePath.fileName || 'photo.jpg',
+            type: picturePath.type || 'image/jpeg'
+        });
+
+        try {
+            const response = await fetch('http://localhost:4321/api/upload', {
+                method: 'POST',
+                body: data,
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+
+            const result = await response.json();
+            
+        } catch (err) {
+            console.error("Error while uploading image", err);
+            Alert.alert("Error", "Failed to upload image.");
+        }
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+
+        try {
+            if (!customerName || !phone || !email || !password || !accountType) {
+                Alert.alert("Error", "Please fill all required fields.");
+                setLoading(false);
+                return;
+            }
+
+            if (password.length < 8) {
+                Alert.alert("Error", "Password is very short.");
+                setLoading(false);
+                return;
+            }
+
+            await uploadImage();
+
+            const userdata = {
+                email,
+                password,
+                accountType,
+                picturePath,
+                customerName,
+                phone,
+                ...(includeAddress && { street, state, city, postalCode })
+            };
+
+            const response = await fetch('http://localhost:4321/customers/create', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userdata)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                Alert.alert("Error", errorData.message || "Failed to create account.");
+                setLoading(false);
+                return;
+            }
+
+            const dataRes = await response.json();
+            Alert.alert("Success", dataRes.message || "Account created successfully!");
+            navigation.navigate('Customers');
+
+        } catch (err) {
+            console.error("Error while creating account", err);
+            Alert.alert("Error", "An unexpected error occurred.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
   
     return (
       <ScrollView
@@ -73,11 +174,10 @@ import {
           <Picker.Item label="Teller" value="Teller" />
         </Picker>
   
-        <TouchableOpacity onPress={() => setIncludeAddress(!includeAddress)}>
+       
           <Text style={styles.checkboxLabel}>
-            Include address? {includeAddress ? '👎' : '👍'}
+            Include address? <TouchableOpacity style={styles.thumbClick} onPress={() => setIncludeAddress(!includeAddress)}> {includeAddress ? '👎' : '👍'} </TouchableOpacity>
           </Text>
-        </TouchableOpacity>
   
         {includeAddress && (
           <>
@@ -112,6 +212,20 @@ import {
             />
           </>
         )}
+        <TouchableOpacity onPress={handleImageUpload} style={styles.uploadButton}>
+            <Text style={styles.uploadImageText}>
+                {picturePath ? "Change Image" : "Upload Image"}
+            </Text>
+        </TouchableOpacity>
+            {picturePath && <Image source={{ uri: picturePath.uri}} style={styles.imagePreview} />}
+            <TouchableOpacity 
+            style={[styles.createAccountButton, loading && styles.createAccountButtonDisabled]}
+            onPress={handleSubmit}
+            disabled={loading}>
+                <Text style={styles.createAccountButtonText}>
+                    { loading ? "Creating Account..." : "Create Account"}
+                </Text>
+            </TouchableOpacity>
       </ScrollView>
     );
   }
@@ -149,8 +263,47 @@ import {
       fontSize: 20,
       color: '#444',
       marginVertical: 8,
-      alignSelf: 'center',
+      alignSelf: 'flex-start',
     },
+    thumbClick: {
+        fontSize: 24,
+        fontWeight: 'bold'
+    },
+    uploadButton: { 
+        width: "100%", 
+        backgroundColor: '#99bbff',
+        opacity: 0.9, 
+        padding: 12, 
+        borderRadius: 8, 
+        alignItems: 'center', 
+        marginVertical: 20 
+    },
+    uploadImageText: {
+        fontSize: 24,
+        fontWeight: '500',
+        textAlign: 'center',
+        color: '#fff'
+    },
+    imagePreview: { 
+        width: 100, 
+        height: 100, 
+        borderRadius: 50 
+    },
+    createAccountButton: { 
+        backgroundColor: '#28a745', 
+        padding: 15, 
+        borderRadius: 8, 
+        alignItems: 'center',
+        marginVertical: 12 
+    },
+    createAccountButtonText: { 
+        fontSize: 24, 
+        fontWeight: 'bold', 
+        color: '#fff' 
+    },
+    createAccountButtonDisabled: { 
+        backgroundColor: '#6c757d' 
+    }
   });
   
   
