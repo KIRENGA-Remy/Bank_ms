@@ -27,9 +27,9 @@ const CustomerAccountSchema = new Schema({
     state: { type: String },
     postalCode: { type: String }
   },
-  picturePath: { type: String},
+  picturePath: { type: String },
   balance: { type: Number, required: true, default: 0 },
-  accountType: { type: String, required: true, enum: ["Savings", "Current", "Business"] },
+  accountType: { type: String, required: true, enum: ["Customer", "Admin", "Vendor"] },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   transactions: [TransactionSchema],
@@ -62,7 +62,7 @@ export interface ICustomerAccount extends Document {
     postalCode: string;
   };
   balance: number;
-  accountType: "Savings" | "Current" | "Business";
+  accountType: "Customer" | "Vendor" | "Admin";
   createdAt: Date;
   updatedAt: Date;
   transactions: {

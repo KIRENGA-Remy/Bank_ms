@@ -10,13 +10,11 @@ interface CreateAccountRequest {
     phone: string;
     accountType: string;
     password: string;
-    address?: {
-        street?: string;
-        city?: string;
-        state?: string;
-        postalCode?: string
-    },
-    picturePath: string
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    picturePath?: string
 }
 
 export const createAccount = async (req: Request, res: Response) => {
@@ -25,10 +23,12 @@ export const createAccount = async (req: Request, res: Response) => {
             customerName, 
             email, 
             phone, 
-            address, 
             accountType, 
-            password ,
-            picturePath
+            password,
+            street, 
+            state, 
+            city, 
+            postalCode
         } = req.body as CreateAccountRequest;
 
         // Validate required fields
@@ -56,18 +56,14 @@ export const createAccount = async (req: Request, res: Response) => {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10)
 
+        const picturePath = req.file ? `/uploads/${req.file.filename}` : null;
         //Create account
         const newAccount = new CustomerAccount({
             customerName,
             password: hashedPassword,
             email,
             phone,
-            address: {
-                street: address?.street || "",
-                city: address?.city || "",
-                state: address?.state || "",
-                postalCode: address?.postalCode || "",
-              },
+            address: { street, city, state, postalCode },
             accountType,
             picturePath
         })
@@ -86,7 +82,7 @@ export const createAccount = async (req: Request, res: Response) => {
 
     } catch (err) {
         console.log("Error creating account", err);
-        res.status(500).json({ message: "Failed to create account."})
+        res.status(500).json({ message: "Failed to create account.", err})
     }
 }
 
@@ -224,7 +220,7 @@ export const transferMoney = async (req: Request, res: Response) => {
             return;
           }
           // Deduct from sender
-          sender.balance -= amount;
+          sender.balance = sender.balance - amount;
           sender.transactions.push({
             transactionId: `TXN-${Date.now()}`,
             type: "Transfer",

@@ -1,28 +1,37 @@
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, FlatList } from 'react-native';
+import { 
+  View, Text, TouchableOpacity, ScrollView, StyleSheet, FlatList, Image 
+} from 'react-native';
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
 
-export default function Customers({ route }) {
-  const { customers } = route.params;
-  const navigation = useNavigation();
+export default function Customers({ route, navigation }) {
+  const customers = route?.params?.customers || [];
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.customersHeader}>
         <Text style={styles.title}>Customers</Text>
-        <TouchableOpacity style={styles.addCustomer} onPress={() => navigation.navigate('CreateAccount')}>
+        <TouchableOpacity 
+          style={styles.addCustomer} 
+          onPress={() => navigation.navigate('CreateAccount')}
+        >
           <Text style={styles.addCustomerText}>+</Text>
         </TouchableOpacity>
       </View>
+
       <FlatList
         data={customers}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.customerCard}>
-            <Text style={styles.customerName}>{item.customerName}</Text>
-            <Text>Email: {item.email}</Text>
-            {/* <Text>Phone: {item.phone}</Text> */}
-            <Text>{item.accountType}</Text>
+            <TouchableOpacity style={styles.profileArea}>
+              <Image style={styles.imageProfile} source={{ uri: item.picturePath }} />
+            </TouchableOpacity>
+            
+            <View style={styles.cardDetails}>
+              <Text style={styles.customerName}>{item.customerName}</Text>
+              <Text style={styles.customerEmail}>{item.email}</Text>
+              <Text style={styles.accountType}>{item.accountType}</Text>
+            </View>
           </View>
         )}
       />
@@ -36,45 +45,73 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f9f9f9',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
   customersHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#222', 
   },
   addCustomer: {
     width: 40,
     height: 40,
-    backgroundColor: '#fff',
+    backgroundColor: '#1E90FF', 
     borderRadius: 20,
-    borderWidth: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   addCustomerText: {
     fontWeight: 'bold',
     fontSize: 24,
-    color: '#000',
+    color: '#FFFFFF',
   },
   customerCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
-    marginBottom: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    marginBottom: 12,
+    backgroundColor: '#1E90FF',
+    borderRadius: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
+  },
+  profileArea: {
+    marginRight: 15,
+  },
+  imageProfile: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 2,
+    borderColor: '#FFFFFF', 
+  },
+  cardDetails: {
+    flex: 1,
   },
   customerName: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 4,
+  },
+  customerEmail: {
+    fontSize: 14,
+    color: '#000', 
+    marginBottom: 2,
+  },
+  accountType: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000', 
   },
 });

@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request } from 'express';
 import { 
-    createAccount, 
+    // createAccount, 
     withdrawMoney, 
     depositMoney, 
     transferMoney, 
@@ -13,7 +13,18 @@ import {
     updateAccount, 
     deleteAccount 
 } from '../controllers/customerAccountController';
+// import multer from 'multer';
 
+// const storage = multer.diskStorage({
+//     destination(req: Request, file: any, callback: any){
+//         callback(null, 'uploads/');
+//     },
+//     filename(req: Request, file: any, callback: any){
+//         callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
+//     }
+// })
+
+// const upload = multer({ storage })
 const router = express.Router();
 
 /**
@@ -57,7 +68,7 @@ const router = express.Router();
  *       500:
  *         description: Failed to create account.
  */
-router.post('/create', createAccount);
+// router.post('/create', createAccount);
 
 /**
  * @swagger

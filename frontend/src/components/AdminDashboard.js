@@ -121,8 +121,7 @@ export default function AdminDashboard(){
                     </TouchableOpacity>
                     <TouchableOpacity 
                     style={styles.card}
-                    onPress={() => navigation.navigate('Customers', { customers })}
-                    >
+                    onPress={() => navigation.navigate('Customers', { customers })}>
                         <Text style={styles.cardTitle}>Customers</Text>
                         <Text style={styles.cardValue}>{customers.length}</Text>
                     </TouchableOpacity>

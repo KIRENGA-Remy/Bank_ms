@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import userRoutes from './routes/userRoutes.js'; 
 import connectDB from './config/db.js';
 import customerAccountRoutes from './routes/customerAccountRoutes.js'
@@ -6,10 +6,10 @@ import adminAccountRoutes from './routes/adminAccountRoutes.js'
 import { config } from 'dotenv';
 import { swaggerSpec, swaggerUi } from './config/swaggerConfig.js';
 import { v4 as uuidv4 } from 'uuid';
-import cors from 'cors'
-import cookieParser from 'cookie-parser';
-import multer from 'multer';
-import bodyParser from 'body-parser';
+import cors from 'cors';
+import { CustomerAccount } from './models/customerAccount.js';
+import bcrypt from 'bcrypt';
+import validator from 'validator';
 
 config()
 
@@ -29,41 +29,78 @@ app.use(cors(
 
 // Middleware
 app.use(express.json({ limit:'30mb' }));
-app.use(cookieParser());
-app.use(bodyParser.json())
 app.use(express.urlencoded({ limit: '30mb', extended: true }));
 app.get('/', (req: Request, res: Response) => {
     res.send("APP is running");
-});
+  });
 
-// Registration routes
 app.use('/users', userRoutes);
-// Customer routes
 app.use('/customers', customerAccountRoutes)
-// Admin routes
 app.use('/admin', adminAccountRoutes)
+app.post('/customers/create', async (req: Request, res: Response) => {
+    try {
+      const { 
+          customerName, 
+          email, 
+          phone, 
+          accountType, 
+          password,
+          street, 
+          state, 
+          city, 
+          postalCode,
+          picturePath
+      } = req.body 
+      
+      if (!customerName || !email || !phone || !accountType || !password) {
+        res.status(400).json({ error: "Missing required fields" });
+        return;
+      }
+  
+      if (!validator.isEmail(email)) {
+        res.status(400).json({ message: "Invalid email address." });
+        return; 
+      }
+  
+      if (password.length < 8) {
+        res.status(400).json({ error: "Password must be at least 8 characters long."});
+        return;
+      }
+      
+      const existingAccount = await CustomerAccount.findOne({ email });
+      if (existingAccount) {
+        res.status(400).json({ message: "Account with this email already exists." });
+        return;
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newAccount = new CustomerAccount({
+        customerName,
+        password: hashedPassword,
+        email,
+        phone,
+        address: { street, city, state, postalCode },
+        accountType,
+        picturePath
+      });
+      await newAccount.save();
 
-// Error handling middleware (optional)
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
-});
-
-const storage = multer.diskStorage({
-    destination(req: Request, file: any, callback: any){
-        callback(null, './images');
-    },
-    filename(req: Request, file: any, callback: any){
-        callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
+      const responseAccount = {
+        accountNumber: newAccount.accountNumber,
+        customerName: newAccount.customerName,
+        email: newAccount.email,
+        phone: newAccount.phone,
+        address: newAccount.address,
+        accountType: newAccount.accountType,
+        balance: newAccount.balance,
+        picturePath: newAccount.picturePath
+      };
+  
+      res.status(200).json({ message: "Account created successfully", account: responseAccount });
+    } catch (err) {
+      console.log("Error creating account", err);
+      res.status(500).json({ message: "Failed to create account.", err });
     }
-})
-
-const upload = multer({ storage });
-app.post('/api/upload', upload.array('photo', 3), (req, res) => {
-    console.log('file', req.files);
-    console.log('body', req.body);
-    res.status(200).json({
-      message: 'success!',
-    });
   });
 
 app.listen(PORT, () => {
